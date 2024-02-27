@@ -1,0 +1,79 @@
+name: Production Deployment
+on:
+  push:
+    branches:
+      - production
+jobs:
+  test:
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run test
+        run: echo Test not available yet
+  build:
+    needs: [test]
+    environment: production
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        node-version: [ 16.13.2 ]
+    steps:
+      - uses: actions/checkout@master
+      - name: Using Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@master
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install application dependencies
+        run: npm install
+      - name: Create environment
+        run: |
+          echo NODE_ENV='${{ vars.NODE_ENV }}' >> .env
+          echo VUE_APP_ENV='${{ vars.APP_ENV }}' >> .env
+          echo VUE_APP_URL='${{ vars.APP_URL }}' >> .env
+          echo VUE_APP_API_BASE_URL='${{ vars.API_BASE_URL }}' >> .env
+          echo VUE_APP_GOOGLE_API_KEY='${{ secrets.GOOGLE_API_KEY }}' >> .env
+          echo VUE_APP_FIREBASE_API_KEY='${{ secrets.FIREBASE_API_KEY }}' >> .env
+          echo VUE_APP_FIREBASE_DOMAIN='${{ secrets.FIREBASE_DOMAIN }}' >> .env
+          echo VUE_APP_FIREBASE_DB_URL='${{ secrets.FIREBASE_DB_URL }}' >> .env
+          echo VUE_APP_FIREBASE_PROJECT_ID='${{ secrets.FIREBASE_PROJECT_ID }}' >> .env
+          echo VUE_APP_FIREBASE_STORAGE_BUCKET='${{ secrets.FIREBASE_STORAGE_BUCKET }}' >> .env
+          echo VUE_APP_FIREBASE_MESSAGING_SENDER_ID='${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}' >> .env
+          echo VUE_APP_FIREBASE_API_ID='${{ secrets.FIREBASE_API_ID }}' >> .env
+          echo VUE_APP_FIREBASE_MEASUREMENT_ID='${{ secrets.FIREBASE_MEASUREMENT_ID }}' >> .env
+          echo VUE_APP_FIREBASE_VAPID_KEY='${{ secrets.FIREBASE_VAPID_KEY }}' >> .env
+          echo VUE_APP_GRAPHQL_GR_ENDPOINT='${{ vars.GRAPHQL_GR_ENDPOINT }}' >> .env
+          echo VUE_APP_GRAPHQL_AUTH_ENDPOINT='${{ vars.GRAPHQL_AUTH_ENDPOINT }}' >> .env
+          echo VUE_APP_GRAPHQL_ACCOUNT_ENDPOINT='${{ vars.GRAPHQL_ACCOUNT_ENDPOINT }}' >> .env
+          echo VUE_APP_GRAPHQL_CLIENT_KEY='${{ secrets.GRAPHQL_CLIENT_KEY }}' >> .env
+          echo VUE_APP_STRIPE_PUBLISHABLE_KEY='${{ secrets.STRIPE_PUBLISHABLE_KEY }}' >> .env
+          echo VUE_APP_STRIPE_CLIENT_ID='${{ secrets.STRIPE_CLIENT_ID }}' >> .env
+          echo VUE_APP_INTERCOM_APP_ID='${{ secrets.INTERCOM_APP_ID }}' >> .env
+          echo VUE_APP_INTERCOM_SECRET_KEY='${{ secrets.INTERCOM_SECRET_KEY }}' >> .env
+      - name: Create firebase messaging service worker
+        run: cp fcm/fcm-prod.js public/firebase-messaging-sw.js
+      - name: Build application
+        run: npm run build 
+      - name: Archive artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: dist
+          path: dist
+  deploy:
+    needs: [build]
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@master
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Deploy to firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting -P prod
+        env:
+          FIREBASE_TOKEN: '${{ secrets.FIREBASE_TOKEN }}'

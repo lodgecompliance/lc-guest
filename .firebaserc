@@ -1,0 +1,22 @@
+{
+  "projects": {
+    "dev": "guestregistration-4140a",
+    "prod": "guest-registration-prod"
+  },
+  "targets": {
+    "guestregistration-4140a": {
+      "hosting": {
+        "lc": [
+          "lc-checkin-staging"
+        ]
+      }
+    },
+    "guest-registration-prod": {
+      "hosting": {
+        "lc": [
+          "lc-checkin-prod"
+        ]
+      }
+    }
+  }
+}
