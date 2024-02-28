@@ -32,7 +32,9 @@ jobs:
           echo NODE_ENV='${{ vars.NODE_ENV }}' >> .env
           echo VUE_APP_ENV='${{ vars.APP_ENV }}' >> .env
           echo VUE_APP_URL='${{ vars.APP_URL }}' >> .env
+          echo VUE_APP_NAME='${{ vars.APP_NAME }}' >> .env
           echo VUE_APP_API_BASE_URL='${{ vars.API_BASE_URL }}' >> .env
+          echo VUE_APP_AUTH_DOMAIN='${{ vars.AUTH_DOMAIN }}' >> .env
           echo VUE_APP_GOOGLE_API_KEY='${{ secrets.GOOGLE_API_KEY }}' >> .env
           echo VUE_APP_FIREBASE_API_KEY='${{ secrets.FIREBASE_API_KEY }}' >> .env
           echo VUE_APP_FIREBASE_DOMAIN='${{ secrets.FIREBASE_DOMAIN }}' >> .env
@@ -46,6 +48,7 @@ jobs:
           echo VUE_APP_GRAPHQL_GR_ENDPOINT='${{ vars.GRAPHQL_GR_ENDPOINT }}' >> .env
           echo VUE_APP_GRAPHQL_AUTH_ENDPOINT='${{ vars.GRAPHQL_AUTH_ENDPOINT }}' >> .env
           echo VUE_APP_GRAPHQL_ACCOUNT_ENDPOINT='${{ vars.GRAPHQL_ACCOUNT_ENDPOINT }}' >> .env
+          echo VUE_APP_GRAPHQL_WALLET_ENDPOINT='${{ vars.GRAPHQL_WALLET_ENDPOINT }}' >> .env
           echo VUE_APP_GRAPHQL_CLIENT_KEY='${{ secrets.GRAPHQL_CLIENT_KEY }}' >> .env
           echo VUE_APP_STRIPE_PUBLISHABLE_KEY='${{ secrets.STRIPE_PUBLISHABLE_KEY }}' >> .env
           echo VUE_APP_STRIPE_CLIENT_ID='${{ secrets.STRIPE_CLIENT_ID }}' >> .env
