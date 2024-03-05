@@ -10,6 +10,7 @@ const getters = {
     current_property: state => state.current_property,
     current_page: state => state.current_page,
     reservations: state => state.current_user?.reservations || [],
+    system: state => state.system,
     snackbar: state => state.snackbar,
     app_layout: state => state.app_layout,
     is_mobile: state => state.is_mobile,
