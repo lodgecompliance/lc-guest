@@ -65,7 +65,7 @@ export default {
             return new Promise(async resolve => {
                 this.mutate({
                     mutation: gql`
-                    mutation createReservationCheckinSession($reservation_id: ID!, $info: [MetaDataInput], $browser: [MetaDataInput], $location: [MetaDataInput]) {
+                    mutation createReservationCheckinSession($reservation_id: ID!, $info: [MetadataInput], $browser: [MetadataInput], $location: [MetadataInput]) {
                         createReservationCheckinSession(reservation_id: $reservation_id, info: $info, browser: $browser, location: $location) {
                           ${QLFields}
                         }
@@ -126,7 +126,7 @@ export default {
             return new Promise(resolve => {
                 this.mutate({
                     mutation: gql`
-                    mutation updateReservationCheckinSessionAttributes($reservation_id: ID!, $session_id: ID!, $data: [MetaDataInput]) {
+                    mutation updateReservationCheckinSessionAttributes($reservation_id: ID!, $session_id: ID!, $data: [MetadataInput]) {
                         updateReservationCheckinSessionAttributes(reservation_id: $reservation_id, session_id: $session_id, data: $data) {
                           ${QLFields}
                         }

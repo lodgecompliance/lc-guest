@@ -22,15 +22,8 @@
     >
         Verifying transaction..
     </v-alert>
-    <v-alert v-if="error" 
-    border="left"
-    colored-border
-    type="error"
-    class="my-2"
-    dismissible
-    >
-        {{ error }}
-    </v-alert>
+    <error-handler :error="error" @retry="initializeTransaction" />
+    <error-handler :error="verificationError" :can-retry="false" />
     <paystack-payment-gateway
     :setup="setup"
     ref="paystackPayment"
@@ -43,10 +36,12 @@
 <script>
 import gql from 'graphql-tag';
 import PaystackPaymentGateway from '@/components/Utilities/PaystackPaymentGateway.vue'
+import ErrorHandler from "@/components/ErrorHandler.vue";
 
 export default {
     name: "ReservationPaystackPayment",
     components: {
+      ErrorHandler,
       PaystackPaymentGateway
     },
     data() {
@@ -54,6 +49,7 @@ export default {
             setup: null,
             computing: false,
             verifying: false,
+            verificationError: null,
             error: null,
             email: null,
         }
@@ -75,53 +71,49 @@ export default {
   methods: {
       initializeTransaction() {
         if(this.$refs.form && !this.$refs.form.validate()) {
-          this.error = "Provide a valid email address"
+          this.error = new Error("Provide a valid email address");
           return;
         }
-          this.error= null;
-          this.computing = true;
-          this.$store.dispatch('mutate', {
-              mutation: gql `
-                  mutation computeReservationPaystackPaymentIntent($property_id: ID!, $charges: [ReservationPaystackPaymentChargeInput!]!, $currency: String!, $email: String!) {
-                      computeReservationPaystackPaymentIntent(property_id: $property_id, charges: $charges, currency: $currency, email: $email) {
-                          key
-                          amount
-                          currency
-                          email
-                          metadata {
-                              user_id
-                              property_id
-                              charges
-                          }
-                      }
-                  }
-              `,
-              variables: {
-                  property_id: this.property.id,
-                  currency: this.reservation.currency,
-                  email: this.email ? this.email : this.availableEmail,
-                  charges: this.charges
-              }
-          })
-          .then(response => {
-              this.setup = response.data.computeReservationPaystackPaymentIntent;
-              this.$refs.paystackPayment.pay();
-          })
-          .catch(e => {
-              this.error = `Payment could not be completed ${e.message}`;
-          })
-          .finally(() => {
-              this.computing = false
-          })
+        this.error= null;
+        this.computing = true;
+        this.$store.dispatch('mutate', {
+            mutation: gql `
+                mutation computeReservationPaystackPaymentIntent($property_id: ID!, $charges: [ReservationPaystackPaymentChargeInput!]!, $currency: String!, $email: String!) {
+                    computeReservationPaystackPaymentIntent(property_id: $property_id, charges: $charges, currency: $currency, email: $email) {
+                        key
+                        amount
+                        currency
+                        email
+                        metadata {
+                            user_id
+                            property_id
+                            charges
+                        }
+                    }
+                }
+            `,
+            variables: {
+                property_id: this.property.id,
+                currency: this.reservation.currency,
+                email: this.email ? this.email : this.availableEmail,
+                charges: this.charges
+            }
+        })
+        .then(response => {
+            this.setup = response.data.computeReservationPaystackPaymentIntent;
+            this.$refs.paystackPayment.pay();
+        })
+        .catch(e => this.error = e )
+        .finally(() => this.computing = false)
       },
 
       paystackVerification({ reference }) {
-          this.error= null;
-          this.verifying = true;
-          this.$store.dispatch('mutate', {
+        this.verifying = true;
+        this.verificationError = null;
+        this.$store.dispatch('mutate', {
               mutation: gql `
-                  mutation  verifyReservationPaystackTransaction($property_id: ID!, $reservation_id: ID!, $reference: ID!) {
-                      verifyReservationPaystackTransaction(property_id: $property_id, reservation_id: $reservation_id, reference: $reference) {
+                  mutation verifyReservationPaystackTransaction($reservation_id: ID!, $reference: ID!) {
+                      verifyReservationPaystackTransaction(reservation_id: $reservation_id, reference: $reference) {
                           status
                           message
                           data {
@@ -176,7 +168,6 @@ export default {
               `,
               variables: {
                   reference,
-                  property_id: this.property.id,
                   reservation_id: this.reservation.id,
               }
           }).then(response => {
@@ -186,7 +177,7 @@ export default {
               }
           })
           .catch(e => {
-              this.error =  `Transaction could not be verified. ${e.message}`;
+              this.verificationError =  e
           })
           .finally(() => {
               this.verifying = false;

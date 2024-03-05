@@ -74,6 +74,7 @@
                             
                             <signature-pad :editable="reservation.already_checkedin" :activate="true" v-model="signature" />
 
+                            <error-handler :error="checkinError" @retry="finalizeCheckin" />
                             <v-btn class="mt-3" :loading="checkingin" @click="finalizeCheckin" color="primary" :disabled="!step.completed">Finalize</v-btn>
                         </v-stepper-content>
                     </template>
@@ -92,10 +93,12 @@ import SignaturePad from '../../../../components/Utilities/SignaturePad.vue';
 import GuestInfo from './GuestInfo.vue';
 
 import CHECKIN_RESERVATION_GUEST from '../../Mutations/checkinReservationGuest';
+import ErrorHandler from "@/components/ErrorHandler.vue";
 
 export default {
     name: "ReservationGuestCheckin",
     components: {
+      ErrorHandler,
        ReservationIdVerification,
        SignaturePad, GuestInfo
     },
@@ -114,6 +117,7 @@ export default {
             signature: null,
             currentStep: 1,
             checkingin: false,
+            checkinError: null
         }
     },
 
@@ -128,17 +132,17 @@ export default {
               completed: this.verificationSubmitted
             })
           }
-            steps.push({
-              id: 'guest-info',
-              completed: this.infoSubmited
-            });
+          steps.push({
+            id: 'guest-info',
+            completed: this.infoSubmited
+          });
 
-            steps.push({
-                id: 'contract',
-                completed:  this.contractSigned
-            })
+          steps.push({
+              id: 'contract',
+              completed:  this.contractSigned
+          })
 
-            return steps;
+          return steps;
         },
 
         infoSubmited() {
@@ -183,6 +187,7 @@ export default {
 
         finalizeCheckin(){
             this.checkingin = true;
+            this.checkinError = null;
             const verification = {...this.verification};
             const info = { ...this.info };
             info.name = undefined;
@@ -216,7 +221,7 @@ export default {
                     this.$emit('checkedin', guest);
                     this.$store.commit('SNACKBAR', {
                         status: true,
-                        text: 'Checkin successfull',
+                        text: 'Checkin successful',
                         color: 'success'
                     })
                 }else{
@@ -228,12 +233,7 @@ export default {
                 }
             })
             .catch(e => {
-                this.$store.commit('TOAST_ERROR', {
-                    show: true,
-                    message: `Something went wrong while checkin you in to the reservation.`,
-                    retry: () => this.reservationCheckin(),
-                    exception: e
-                })
+                this.error = e
             })
             .finally(() => {
                 this.checkingin = false;

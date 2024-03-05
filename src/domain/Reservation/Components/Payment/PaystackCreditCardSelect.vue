@@ -1,5 +1,5 @@
 <template>
-    <data-container :loading="loading">
+    <data-container :loading="loading" :error="error" @retry="getPropertyCustomer">
         <div v-if="cards.length">
           <div class="grey--text text-center">
             <small>Your authorized card at {{ property.name }} </small>
@@ -47,12 +47,13 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import {mapActions, mapGetters} from 'vuex';
 import gql from 'graphql-tag';
 
 import DataContainer from '@/components/DataContainer.vue';
 import PaystackCreditCard from '@/components/Utilities/PaystackCreditCard.vue';
 import PaystackNewCreditCard from '@/components/Utilities/PaystackNewCreditCard.vue';
+import config from "@/config";
 
 export default {
     name: "PaystackCreditCardSelect",
@@ -81,9 +82,9 @@ export default {
     },
 
     computed: {
-
+        ...mapGetters(['current_user']),
         cards(){
-            return this.customer && this.customer.authorizations ? this.customer.authorizations : []
+            return this.customer?.authorizations || [];
         }
     },
 
@@ -92,50 +93,82 @@ export default {
             'query', 'mutate'
         ]),
 
-        getPropertyCustomer(){
-            if(!(this.property?.integrations || []).includes('paystack')) {
-                this.error = `${this.property.name} can not process this transaction at the moment`;
-                return;
-            }
-            this.loading = true;
+        getPropertyIntegration() {
+          return new Promise((resolve, reject) => {
             this.query({
-                query: gql `
-                    query getPropertyPaystackCustomer($property_id: ID!, $user_id: ID) {
-                        getPropertyPaystackCustomer(property_id: $property_id, user_id: $user_id) {
-                            first_name
-                            last_name
-                            email
-                            phone
-                            authorizations {
-                                authorization_code
-                                card_type
-                                last4
-                                exp_month
-                                exp_year
-                                reusable
-                                bank
-                            }
-                        }
+              query: gql`
+                query getPropertyById($id: ID!){
+                  getPropertyById(id: $id){
+                    integrations {
+                      paystack {
+                        integration_id
+                      }
                     }
-                `,
+                  }
+               }`,
+              variables: {
+                id: this.property.id
+              }
+            }).then(response => {
+              this.propertyIntegration = response.data.getPropertyById?.integrations?.paystack;
+              if(this.propertyIntegration && this.propertyIntegration.integration_id) {
+                return resolve(this.propertyIntegration)
+              } else {
+                return reject(new Error('Gateway not enabled for property'))
+              }
+            })
+          })
+        },
+
+        getPaystackCustomer(){
+          return this.getPropertyIntegration()
+            .then(() => {
+              return this.query({
+                domain: config.apollo.account,
+                query: gql `
+                      query getBusinessPaystackCustomer($business_id: ID!, $integration_id: ID!, $user_id: ID!) {
+                          getBusinessPaystackCustomer(business_id: $business_id, integration_id: $integration_id, user_id: $user_id) {
+                              first_name
+                              last_name
+                              email
+                              phone
+                              authorizations {
+                                  authorization_code
+                                  card_type
+                                  last4
+                                  exp_month
+                                  exp_year
+                                  reusable
+                                  bank
+                              }
+                          }
+                      }
+                  `,
                 variables: {
-                    property_id: this.property.id,
+                  business_id: this.property.business_id,
+                  integration_id: this.propertyIntegration.integration_id,
+                  user_id: this.current_user.profile.id
                 }
-            })
+              })
+          })
             .then(response => {
-                this.customer = response.data.getPropertyPaystackCustomer;
-                this.$emit('customer-fetched', this.customer)
+                this.customer = response.data.getBusinessPaystackCustomer;
+                return this.customer;
+            })
+            .catch(e => this.error = e)
+            .finally(() => this.loading = false )
+        },
 
-                if(!this.cards.length) this.addCard = true;
-                else this.creditCard = this.cards[0];
-
-            })
-            .catch(e => {
-                this.error = `Could not get credit cards. ${e.message}`
-            })
-            .finally(() => {
-                this.loading = false
-            })
+        getPropertyCustomer() {
+          this.loading = true;
+          this.getPaystackCustomer()
+          .then(customer => {
+            this.$emit('customer-fetched', customer)
+            if(!this.cards.length) this.addCard = true;
+            else this.creditCard = this.cards[0];
+          })
+          .catch(e => this.error = e)
+          .finally(() => this.loading = false)
         },
 
         creditCardReceived(card) {

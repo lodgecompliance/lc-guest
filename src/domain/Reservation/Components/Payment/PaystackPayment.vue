@@ -23,15 +23,7 @@
                 @customer-fetched="paystackCustomerFetched"
                 @credit-card="creditCardSelected"
             />
-
-            <v-alert v-if="error"
-                     border="left"
-                     colored-border
-                     type="error"
-                     class="my-2"
-            >
-              {{ error }}
-            </v-alert>
+            <error-handler :error="error" @retry="chargeAuthorization" />
             <v-alert v-if="verifyingTransaction"
                      border="left"
                      colored-border
@@ -58,11 +50,13 @@
 import gql from 'graphql-tag';
 import PaystackCreditCardSelect from './PaystackCreditCardSelect.vue';
 import session from "@/domain/Reservation/Mixins/session";
+import ErrorHandler from "@/components/ErrorHandler.vue";
 
 export default {
     name: "ReservationPaystackPayment",
     mixins: [session],
     components: {
+      ErrorHandler,
         PaystackCreditCardSelect
     },
 
@@ -121,8 +115,8 @@ export default {
              }
               return this.$store.dispatch('mutate', {
                   mutation: gql `
-                      mutation chargeReservationPaystackAuthorization($property_id: ID!, $reservation_id: ID!, $authorization_code: ID!,  $charge: ReservationPaystackPaymentChargeInput!) {
-                          chargeReservationPaystackAuthorization(property_id: $property_id, reservation_id: $reservation_id, authorization_code: $authorization_code, charge: $charge) {
+                      mutation chargeReservationPaystackAuthorization($reservation_id: ID!, $authorization_code: ID!,  $charge: ReservationPaystackPaymentChargeInput!) {
+                          chargeReservationPaystackAuthorization(reservation_id: $reservation_id, authorization_code: $authorization_code, charge: $charge) {
                               status
                               message
                               data {
@@ -132,7 +126,6 @@ export default {
                       }
                   `,
                   variables: {
-                      property_id: this.property.id,
                       reservation_id: this.reservation.id,
                       authorization_code: this.creditCard.authorization_code,
                       charge
@@ -146,8 +139,8 @@ export default {
                   const charge = response.data.chargeReservationPaystackAuthorization;
                   return this.$store.dispatch('mutate', {
                       mutation: gql `
-                          mutation  verifyReservationPaystackTransaction($property_id: ID!, $reservation_id: ID!, $reference: ID!) {
-                              verifyReservationPaystackTransaction(property_id: $property_id, reservation_id: $reservation_id, reference: $reference) {
+                          mutation verifyReservationPaystackTransaction($reservation_id: ID!, $reference: ID!) {
+                              verifyReservationPaystackTransaction(reservation_id: $reservation_id, reference: $reference) {
                                   status
                                   message
                                   data {
@@ -235,7 +228,7 @@ export default {
               }
           })
           .catch(e => {
-              this.error = `charge could not be completed ${e.message}`;
+              this.error = e;
               this.createSessionActivity({
                 title: `Failed Payment via Paystack`,
                 description: `Payment via Paystack failed: ${e.message}`

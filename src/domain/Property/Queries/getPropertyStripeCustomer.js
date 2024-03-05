@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 export default gql`
-    query getPropertyStripeCustomer($user_id: ID, $property_id: ID!){
-        getPropertyStripeCustomer(user_id: $user_id, property_id: $property_id ){
+    query getBusinessStripeCustomer($business_id: ID!, $integration_id: ID!, $user_id: ID!){
+        getBusinessStripeCustomer(business_id: $business_id, integration_id: $integration_id, user_id: $user_id,){
             customer {
                 id
                 object

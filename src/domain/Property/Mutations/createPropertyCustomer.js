@@ -2,8 +2,8 @@ import gql from 'graphql-tag';
 
 export default gql`
 
-    mutation createPropertyCustomer($property_id: ID!, $user_id: ID!, $name: String, $source: ID, $email: String, $phone: String, $description: String ){
-        createPropertyCustomer(property_id: $property_id, user_id: $user_id, name: $name, source: $source, email: $email, phone: $phone, description: $description){
+    mutation createBusinessStripeCustomer($business_id: ID!, $integration_id: ID!, $user_id: ID!, $name: String, $source: ID, $email: String, $phone: String, $description: String ){
+        createBusinessStripeCustomer(business_id: $business_id, integration_id: $integration_id, user_id: $user_id, name: $name, source: $source, email: $email, phone: $phone, description: $description){
             customer {
                 id
                 object
@@ -22,8 +22,8 @@ export default gql`
                 email
                 livemode
                 metadata {
-                    property_id
-                    user_id
+                    key
+                    value
                 }
                 name
                 phone

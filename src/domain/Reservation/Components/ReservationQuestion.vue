@@ -33,7 +33,7 @@
             v-else-if="question.response_type === 'number'"
             type="number"
             outlined dense
-            :rules="[(value) => question.required && !!value ? 'This field is required' : true]"
+            :rules="[(value) => question.required && !value ? 'This field is required' : true]"
             v-model="response"
             placeholder="Your response..."
             ></v-text-field>
@@ -42,7 +42,7 @@
             v-else
             type="text"
             outlined dense
-            :rules="[(value) => question.required && !!value ? 'This field is required' : true]"
+            :rules="[(value) => question.required && !value ? 'This field is required' : true]"
             v-model="response"
             placeholder="Your response..."
             >

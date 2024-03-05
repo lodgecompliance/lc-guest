@@ -79,19 +79,21 @@ export default {
             this.loading = true;
             this.$store.dispatch('query', {
                 query: gql`
-                    query getPropertyReservationSetting($property_id: ID!) {
-                        getPropertyReservationSetting(property_id: $property_id) {
-                            guest_info
+                    query getPropertyById($id: ID!) {
+                      getPropertyById(id: $id) {
+                        reservation_settings {
+                          guest_info
                         }
+                      }
                     }`,
                     variables: {
-                        property_id: this.property.id
+                        id: this.property.id
                     }
             }).then(response => {
-                this.fields = response.data.getPropertyReservationSetting.guest_info ?? []
+                this.fields = response.data.getPropertyById?.reservation_settings?.guest_info ?? []
                 if( this.fields && this.fields.length) {
                     this.fields.forEach(field => {
-                        this.info[field] = this.current_user.profile.guest_info ?  this.current_user.profile.guest_info[field] : null
+                        this.info[field] = this.current_user.guest_info ?  this.current_user.guest_info[field] : null
                     })
                     if(this.fields.some(field => this.info[field] == null)) this.edit = true;
                 }

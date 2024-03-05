@@ -177,7 +177,7 @@ export default {
       },
 
       canStart() {
-          return this.start || this.$route.query.start === 1
+          return this.start || this.$route.query.start == 1
       },
 
       startPath() {
@@ -200,12 +200,9 @@ export default {
 
     getStarted() {
         this.starting = true
-        this.setSession().then(() => {
-          this.$router.replace({
-            ...this.$route,
-            query: { ...this.$route.query, start: 1 }
-          })
-        }).finally(() => this.starting = false )
+        this.setSession()
+            .then(() => this.start = true)
+            .finally(() => this.starting = false )
     },
 
     verificationAvailable(verification){

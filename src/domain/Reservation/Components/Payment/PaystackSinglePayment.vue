@@ -103,8 +103,8 @@ export default {
           return new Promise((resolve, reject) => {
             this.$store.dispatch('mutate', {
               mutation: gql `
-                mutation chargeReservationPaystackAuthorization($property_id: ID!, $reservation_id: ID!, $authorization_code: ID!,  $charge: ReservationPaystackPaymentChargeInput!) {
-                    chargeReservationPaystackAuthorization(property_id: $property_id, reservation_id: $reservation_id, authorization_code: $authorization_code, charge: $charge) {
+                mutation chargeReservationPaystackAuthorization($reservation_id: ID!, $authorization_code: ID!,  $charge: ReservationPaystackPaymentChargeInput!) {
+                    chargeReservationPaystackAuthorization(reservation_id: $reservation_id, authorization_code: $authorization_code, charge: $charge) {
                         status
                         message
                         data {
@@ -128,8 +128,8 @@ export default {
           return new Promise((resolve, reject) => {
             this.$store.dispatch('mutate', {
               mutation: gql `
-                mutation  verifyReservationPaystackTransaction($property_id: ID!, $reservation_id: ID!, $reference: ID!) {
-                    verifyReservationPaystackTransaction(property_id: $property_id, reservation_id: $reservation_id, reference: $reference) {
+                mutation  verifyReservationPaystackTransaction($reservation_id: ID!, $reference: ID!) {
+                    verifyReservationPaystackTransaction(reservation_id: $reservation_id, reference: $reference) {
                         status
                         message
                         data {

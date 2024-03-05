@@ -184,7 +184,7 @@ export default {
         staying: {
             immediate: true,
             handler(staying) {
-                const index = this.guests.findIndex(g => g.user_id == this.current_user.profile.id);
+                const index = this.guests.findIndex(g => g.user_id === this.current_user.profile.id);
 
                 if(staying) {
 

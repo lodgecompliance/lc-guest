@@ -92,7 +92,7 @@
                     <v-card-text>
                       <p>The following questions have been required to be answered for your checkin</p>
                       <reservation-questions
-                          v-if="currentStep == (i+1)"
+                          v-if="currentStep === (i+1)"
                           :questions="reservation.questions"
                           @responses="questionResponded" />
                     </v-card-text>

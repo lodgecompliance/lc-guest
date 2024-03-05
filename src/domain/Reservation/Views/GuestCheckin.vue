@@ -7,7 +7,7 @@
             </v-col>
           </v-row>
         </template>
-        <data-container :loading="loading">
+        <data-container :loading="loading" :error="error" @retry="getReservation">
             <template v-slot:loading>
                 <reservation-skeleton />
             </template>
@@ -18,7 +18,7 @@
                   <v-sheet class="pa-3" rounded>
                     <div class="text-center">
                       <h2>We could not find that reservation</h2>
-                      <p color="grey">check that the url is valid or contact your host</p>
+                      <p>check that the url is valid or contact your host</p>
                     </div>
                   </v-sheet>
                 </v-col>
@@ -145,23 +145,22 @@
                                           </template>
 
                                           <template v-else>
-                                                      <div class="d-flex align-center my-3">
-                                                          <v-btn icon @click="start = false">
-                                                              <v-icon>mdi-arrow-left</v-icon>
-                                                          </v-btn>
-                                                          <p class="ma-0 ml-2">Checkin in as {{ guest.name }}</p>
-                                                      </div>
+                                            <div class="d-flex align-center my-3">
+                                                <v-btn icon @click="start = false">
+                                                    <v-icon>mdi-arrow-left</v-icon>
+                                                </v-btn>
+                                                <p class="ma-0 ml-2">Checkin in as {{ guest.name }}</p>
+                                            </div>
 
-                                                      <reservation-guest-checkin
-                                                      :property="property"
-                                                      :reservation="reservation"
-                                                      :guest="guest"
-                                                      :primary-guest="primaryGuest"
-                                                      :startAgainPath="startPath"
-                                                      @checkedin="guestCheckedIn"
-                                                      />
-
-                                                  </template>
+                                            <reservation-guest-checkin
+                                            :property="property"
+                                            :reservation="reservation"
+                                            :guest="guest"
+                                            :primary-guest="primaryGuest"
+                                            :startAgainPath="startPath"
+                                            @checkedin="guestCheckedIn"
+                                            />
+                                        </template>
                                     </v-col>
                                 </v-row>
                             </v-sheet>
@@ -175,7 +174,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import {mapActions, mapGetters, mapMutations} from 'vuex';
 import { auth } from '@/firebase';
 
 import AppLayer from '@/AppLayer';
@@ -205,8 +204,8 @@ export default {
         loading: false,
         start: false,
         reservation: null,
-        property: null,
         guest: null,
+        error: null,
       }
   },
 
@@ -218,7 +217,7 @@ export default {
         ]),
 
         id(){
-            return this.$route.params.id
+            return this.$route.params.reservation
         },
 
         canStart() {
@@ -256,14 +255,16 @@ export default {
     },
   
   methods:{
-      ...mapActions([
-          'query',
-      ]),
+    ...mapActions([
+        'query',
+    ]),
+    ...mapMutations([
+        'SET_CURRENT_PROPERTY'
+    ]),
 
     getStarted(){
         this.start = true;
     },
-
 
     reservationCheckinCancelled() {
         this.start = false;
@@ -271,7 +272,7 @@ export default {
 
     getReservation(){
         this.loading = true;
-
+        this.error = null;
         this.query({
             query: GET_RESERVATION,
             variables: {
@@ -280,32 +281,15 @@ export default {
         })
         .then(response => {
             if(response && response.data.getReservation){
-                this.reservation = response.data.getReservation;
-
-                this.property = this.reservation && this.reservation.property && this.reservation.property.property
-                ? this.reservation.property.property
-                : null;
-
+              this.reservation = response.data.getReservation;
+              this.SET_CURRENT_PROPERTY(this.reservation.property);
             }
-
            if(this.$route.query.guest) {
-               this.guest = this.reservation.guests.find(g => g.id === this.$route.query.guest);
+             this.guest = this.reservation.guests.find(g => g.id === this.$route.query.guest);
            }
-           return Promise.resolve(null)
-        })
-        .then(() => auth.getRedirectResult())
-        .then(result => {
-            // if coming back from authentication redirection from Google
-            if(result.user && !this.start) {
-                this.start = true;
-            }
         })
         .catch(e => {
-            this.$refs.app.toastError({
-                message: `Could not get reservation.`,
-                retry: () => this.getReservation(),
-                exception: e
-            });
+            this.error = e
         })
         .finally(() => {
             this.loading = false;
@@ -322,7 +306,7 @@ export default {
   },
   mounted(){
     this.getReservation()
-},
+  },
 
 }
 </script>
