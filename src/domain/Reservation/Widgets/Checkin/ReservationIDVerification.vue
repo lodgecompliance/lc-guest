@@ -4,24 +4,26 @@
       :error="error"
       @retry="getIdentity"
   >
-    <v-card v-if="verification" outlined>
-      <files-preview
-          :value="[verification.id_image]"
-          :grid="1" :allow-remove="false"
-          :item-height="150"
-      />
-      <v-card-title>
-        {{ [verification.first_name, verification.last_name].join(" ") }}
-      </v-card-title>
-      <v-card-subtitle class="grey--text">
-        {{ verification.id_type }}: {{ verification.id_number }}
-      </v-card-subtitle>
-    </v-card>
-    <v-card v-else outlined>
-      <v-card-text class="text-center grey--text py-5">
-        ID verification not available
-      </v-card-text>
-    </v-card>
+      <v-card v-if="verification" outlined>
+        <files-preview
+            :value="[verification.id_image]"
+            :grid="1" :allow-remove="false"
+            :item-height="150"
+        />
+        <v-card-title>
+          {{ [verification.first_name, verification.last_name].join(" ") }}
+        </v-card-title>
+        <v-card-subtitle class="grey--text">
+          {{ verification.id_type }}: {{ verification.id_number }}
+        </v-card-subtitle>
+        <slot v-bind="{ loading, verification }" />
+      </v-card>
+      <v-card v-else outlined>
+        <v-card-text class="text-center grey--text py-5">
+          ID verification not available
+        </v-card-text>
+        <slot v-bind="{ loading, verification }" />
+      </v-card>
   </data-container>
 </template>
 
@@ -43,7 +45,7 @@ export default {
     }
   },
   props: {
-    userId: Object
+    userId: String
   },
   computed: {
     ...mapGetters(['current_user'])
@@ -102,10 +104,19 @@ export default {
         variables: { id: this.current_user.profile.id }
       })
       .then(response => {
-        this.verification = response.data.getUserById?.id_verification
+        this.verification = response.data.getUserById?.id_verification;
+        this.$emit('verification', response.data.getUserById?.id_verification)
       })
       .catch(e => this.error = e)
       .finally(() => this.loading = false)
+    }
+  },
+  watch: {
+    userId: {
+      immediate: true,
+      handler() {
+        this.getIdentity()
+      }
     }
   }
 }

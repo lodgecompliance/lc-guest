@@ -20,7 +20,7 @@
             ref="contract"
             v-on="$listeners"
             :reservation="reservation"
-            :checkin="{ ...checkin, verification }"
+            :checkin="checkin"
             :property="property"
             :pdfable="false"
         />

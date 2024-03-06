@@ -249,7 +249,8 @@ export default {
         },
 
         alreadyCheckedin() {
-            return this.allGuests.find(guest => guest.user_id === this.current_user.profile.id);
+            return this.current_user.profile
+                && this.allGuests.find(guest => guest.user_id === this.current_user.profile.id);
         }
 
     },
@@ -259,7 +260,8 @@ export default {
         'query',
     ]),
     ...mapMutations([
-        'SET_CURRENT_PROPERTY'
+        'SET_CURRENT_PROPERTY',
+        'SET_AUTH_REQUIRED',
     ]),
 
     getStarted(){

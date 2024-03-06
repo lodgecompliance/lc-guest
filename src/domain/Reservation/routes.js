@@ -23,7 +23,6 @@ export default [
         component: ReservationGuestCheckin,
         meta: {
             title: "Guest Checkin",
-            requiresAuth: true,
         },
     },
     {

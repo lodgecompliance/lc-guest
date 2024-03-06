@@ -14,7 +14,7 @@
                     :editable="currentStep >= (i+1)"
                     edit-icon="mdi-account-check"
                 >
-                  Personal Information
+                  ID Verification
                 </v-stepper-step>
                 <v-stepper-content
                     :key="`step-content-${step.id}`"
@@ -23,14 +23,21 @@
                 >
                   <div class="pa-1">
                     <reservation-id-verification
-                        v-if="currentStep == (i+1)"
-                        :reservation="reservation"
-                        :property="property"
-                        :callback-url="startAgainPath"
+                        v-if="currentStep === (i+1)"
+                        :user-id="current_user.profile.id"
                         @verification="verificationReceived"
-                        @completed="currentStep++"
                         ref="idVerification"
-                    />
+                    >
+                      <template #default="{ loading, verification }">
+                        <v-card-text v-if="verification">
+                          Your ID verification will be shared with {{ property.name }}
+                        </v-card-text>
+                        <v-card-actions>
+                          <v-spacer></v-spacer>
+                          <v-btn color="primary" @click="currentStep++" :disabled="loading" depressed>Continue</v-btn>
+                        </v-card-actions>
+                      </template>
+                    </reservation-id-verification>
                   </div>
                 </v-stepper-content>
               </template>
@@ -54,7 +61,7 @@
                   <v-card class="pa-1" flat>
                     <v-card-text>
                       <reservation-guest
-                          v-if="currentStep == (i+1)"
+                          v-if="currentStep === (i+1)"
                           :property="property"
                           :reservation="reservation"
                           @guests="guestsReceived"
@@ -256,7 +263,6 @@
                       :reservation="reservation"
                       :start-again-path="startAgainPath"
                       :checkin="{
-                            verification,
                             guests,
                             checkin: {  agreements, questions: normalizedResponses,  credit_card }
                             }"
