@@ -170,7 +170,7 @@ export default {
             if(this.updateExists) {
               this.refreshApp();
             } else {
-              this.error = e.message;
+              this.error = e
             }
           })
           .finally(() => {
@@ -245,9 +245,8 @@ export default {
                   vm.SET_MODE(null)
                   vm.UNSET_CURRENT_USER()
                   if(vm.$route.meta.requiresAuth) {
-                      vm.SET_AUTH_REQUIRED(true);
-                      vm.SET_APP_STATE(false);
-                  } else vm.SET_APP_STATE(true);
+                    vm.SET_AUTH_REQUIRED(true);
+                  }
                 }
                 break;
               case "view-account":
