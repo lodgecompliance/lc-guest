@@ -1,5 +1,5 @@
 <template>
-  <v-menu>
+  <v-menu v-if="current_user.profile">
     <template v-slot:activator="{ on }">
       <profile-avatar
           :profile="current_user.profile"

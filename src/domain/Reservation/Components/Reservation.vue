@@ -24,7 +24,7 @@
         </v-card-subtitle>
           <v-card-text class="mt-n3 d-flex justify-space-between">
             <div>
-              <small v-if="reservation.checkedin" class="gray--text">{{ checkinMoment.format('MMM D, YYYY') }}, {{ checkinMoment.fromNow() }}</small>
+              <small v-if="reservation.checkedin" class="gray--text">{{ checkedinAtMoment.format('MMM D, YYYY') }}, {{ checkinMoment.fromNow() }}</small>
               <small v-else class="warning--text">Waiting for checkin</small>
             </div>
             <reservation-status :reservation="reservation" />

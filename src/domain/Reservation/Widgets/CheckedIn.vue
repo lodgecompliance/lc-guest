@@ -1,5 +1,5 @@
 <template>
-    <data-container :loading="loading">
+    <data-container :loading="loading" :error="error" @retry="getReservationCheckin">
       <slot v-if="checkin" v-bind="{ checkin, getReservationCheckin }">
         <template>
           <reservation-checkin-contract ref="contract"
@@ -283,6 +283,7 @@
         data(){
             return {
                 loading: true,
+                error: null,
                 checkin: null,
                 vertical: false,
                 panel: 0,
@@ -310,6 +311,7 @@
 
             getReservationCheckin(){
                 this.loading = true;
+                this.error = null;
                 this.$store.dispatch('query',{
                     query: GET_RESERVATION_CHECKIN,
                     variables: {
@@ -327,12 +329,7 @@
                     }
                 })
                 .catch(e => {
-                    this.$store.commit("TOAST_ERROR", {
-                        show: true,
-                        message: `Could not get reservation checkin information.`,
-                        retry: () => this.getReservationCheckin(),
-                        exception: e
-                    });
+                    this.error = e
                 })
                 .finally(() => {
                     this.loading = false;

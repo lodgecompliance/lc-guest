@@ -267,7 +267,9 @@ export default {
               route.query?.source === "sdk" || route.name === 'reservation.sdk.form'
               ? 'sdk' : 'application'
           )
-          this.SET_AUTH_REQUIRED(route.meta.requiresAuth && !this.authenticated)
+          if(route.meta.requiresAuth && !this.authenticated) {
+            this.SET_AUTH_REQUIRED(true);
+          } else this.SET_APP_STATE(true)
         }
       }
     }

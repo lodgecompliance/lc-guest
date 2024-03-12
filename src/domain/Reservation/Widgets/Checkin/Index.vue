@@ -428,7 +428,7 @@ export default {
 
             const requiredQuestionsAnswered = () => {
                 return this.normalizedResponses.every(question => {
-                    if(question.required)  return question.response != null && question.response != ''
+                    if(question.required) return question.response != null && question.response != ''
                     return true;
                 }); 
             }

@@ -1,5 +1,5 @@
 <template>
-    <data-container :loading="loading">
+    <data-container :loading="loading" :error="error" @retry="getUserReservations">
         <template v-slot:loading>
             <v-row>
                 <v-col cols="12" sm="6" md="4" v-for="i in 6" :key="i">
@@ -37,6 +37,7 @@ export default {
     data(){ 
         return {
             loading: false,
+            error: null,
             reservations: [],
         }
     },
@@ -47,6 +48,7 @@ export default {
     methods: {
         getUserReservations(){
             this.loading = true;
+            this.error = null;
             this.$store.dispatch('query', {
                 query: GET_USER_RESERVATIONS,
                 variables: {
@@ -58,12 +60,7 @@ export default {
                 this.reservations = response.data.getUserReservations ? response.data.getUserReservations.data : []
             })
             .catch(e => {
-                this.$store.commit('TOAST_ERROR', {
-                    show: true,
-                    retry: () => this.getUserReservations(),
-                    message: `Couldn't get reservations`,
-                    exception: e
-                })
+                this.error = e;
             })
             .finally(() => {
                 this.loading = false;
