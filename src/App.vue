@@ -28,6 +28,7 @@
         <h4>{{ current_page.title || appName }}</h4>
       </v-toolbar-title>
       <v-spacer></v-spacer>
+      <header-notifications v-if="authenticated" class="mr-2" />
       <app-menu @signout="signUserOut" />
     </v-app-bar>
 
@@ -99,11 +100,13 @@ import config from './config';
 import ProfileAvatar from "@/components/ProfileAvatar.vue";
 import ErrorHandler from "@/components/ErrorHandler.vue";
 import AppMenu from "@/components/AppMenu.vue";
+import HeaderNotifications from "@/components/HeaderNotifications.vue";
 
 export default {
   name: 'App',
   mixins: [update],
   components: {
+    HeaderNotifications,
     AppMenu,
     ErrorHandler,
     ProfileAvatar,
