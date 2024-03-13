@@ -64,9 +64,11 @@ jobs:
           name: dist
           path: dist
   deploy:
-    needs: [build]
+    needs: [ build ]
     environment: staging
     runs-on: ubuntu-latest
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS: ciServiceAccount.json
     steps:
       - name: Checkout repo
         uses: actions/checkout@master
@@ -75,9 +77,15 @@ jobs:
         with:
           name: dist
           path: dist
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+      - name: Create CI service account
+        shell: bash
+        run: |
+          echo "${{ secrets.CI_SERVICE_ACCOUNT }}" | base64 --decode > "ciServiceAccount.json"
       - name: Deploy to firebase
-        uses: w9jds/firebase-action@master
-        with:
-          args: deploy --only hosting -P dev
-        env:
-          FIREBASE_TOKEN: '${{ secrets.FIREBASE_TOKEN }}'
+        run: firebase deploy --only hosting -P dev
+      - name: Remove credentials file
+        if: success() || failure()
+        run: |
+          rm ciServiceAccount.json
