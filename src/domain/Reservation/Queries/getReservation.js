@@ -65,7 +65,8 @@ export default gql`
                 phone
                 image
                 cover_image
-                address     
+                address  
+                currency   
             }
             user {
                 id

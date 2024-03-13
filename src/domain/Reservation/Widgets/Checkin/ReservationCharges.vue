@@ -232,11 +232,10 @@ export default {
 
         getCharges(){
             this.charges = [];
-            // this.loading = true;
-            if(this.reservation.balance && this.reservation.currency){
+            if(this.reservation.balance){
                 this.charges.push({
                     id: this.reservation.id,
-                    currency: this.reservation.currency,
+                    currency: this.reservation.currency || this.property.currency,
                     amount: this.reservation.balance,
                     description: "Reservation balance",
                     type: 'instant',

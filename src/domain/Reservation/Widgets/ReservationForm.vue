@@ -137,14 +137,14 @@
 
 <script>
 import DataContainer from '../../../components/DataContainer';
-import {mapActions} from "vuex";
+import {mapActions, mapMutations} from "vuex";
 import gql from "graphql-tag";
 import form from "@/mixins/form";
 import moment from "moment/moment";
 import axios from "axios";
 import config from "@/config";
 export default {
-    name: "ReservationSdkForm",
+    name: "ReservationForm",
     mixins: [form],
     components: {
       DataContainer
@@ -159,12 +159,8 @@ export default {
         }
     },
     computed: {
-      apiKey() {
-        return this.$route.query.apiKey || "";
-      },
       propertyId() {
-        const [env, propertyId] = this.apiKey.split('-');
-        return propertyId;
+        return this.$route.params.property;
       },
 
       minCheckinDate(){
@@ -185,32 +181,24 @@ export default {
         }
         return 0;
       },
-
       rooms() {
         return this.property?.rooms || []
       }
     },
-    props: {
-        userId: String,
-        includes: Array
-    },
     methods: {
       ...mapActions(['query']),
+      ...mapMutations(['SET_CURRENT_PROPERTY']),
 
       init() {
           this.getProperty();
       },
 
       getProperty() {
-        if(!this.apiKey) {
-          this.formError = new Error("Invalid API key");
-          return;
-        }
         this.loading = true;
         this.query({
           query:  gql`
-            query getProperty($id: ID!){
-                getProperty(id: $id){
+            query getPropertyById($id: ID!){
+                getPropertyById(id: $id){
                     id
                     name
                     email
@@ -224,13 +212,19 @@ export default {
                       amount
                       available
                     }
+                    integrations {
+                      api {
+                        key
+                      }
+                    }
                 }
             }`,
           variables: {
             id: this.propertyId
           }
         }).then(response => {
-          this.property = response?.data?.getProperty
+          this.property = response?.data?.getPropertyById
+          this.SET_CURRENT_PROPERTY(this.property);
         })
         .catch(e => {
           this.formError = e
@@ -245,7 +239,7 @@ export default {
           baseURL: config.api.baseUrl,
           headers: {
             'Content-type': 'application/json',
-            'x-property-api-key': this.apiKey
+            'x-property-api-key': this.property?.integrations?.api?.key
           }
         }).post("/reservation", {
           ...this.form,

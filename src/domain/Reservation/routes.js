@@ -5,7 +5,7 @@ import ReservationCharges from './Views/Charges.vue';
 import ReservationDamages from './Views/Damages.vue';
 import ReservationGuests from './Views/Guests.vue';
 import ReservationDocuments from './Views/Documents.vue';
-import ReservationFormSdk from './Widgets/SdkForm.vue';
+import ReservationForm from './Widgets/ReservationForm.vue';
 
 export default [
     {
@@ -71,11 +71,11 @@ export default [
         },
     },
     {
-        path: '/sdk',
-        name: 'reservation.sdk.form',
-        component: ReservationFormSdk,
+        path: '/:property/reservation',
+        name: 'reservation.form',
+        component: ReservationForm,
         meta: {
-            layout: 'plain',
+            title: "Book Reservation",
             requiresAuth: false,
         },
     }

@@ -264,12 +264,12 @@ export default {
       $route: {
         immediate: true,
         handler(route) {
-          this.SET_APP_LAYOUT(route.meta.layout || 'full');
           this.SET_CURRENT_PAGE({ title: route.meta.title });
           this.SET_MODE(
-              route.query?.source === "sdk" || route.name === 'reservation.sdk.form'
+              route.query?.source === "sdk"
               ? 'sdk' : 'application'
           )
+          this.SET_APP_LAYOUT(this.mode === 'sdk' ? 'plain' : route.meta.layout || 'full');
           if(route.meta.requiresAuth && !this.authenticated) {
             this.SET_AUTH_REQUIRED(true);
           } else this.SET_APP_STATE(true)
