@@ -11,7 +11,8 @@
           <v-list-item-subtitle v-if="agreement.link">
             <small class="grey--text">{{ agreement.link }}</small>
           </v-list-item-subtitle>
-            <slot name="list-item-content" v-bind="{ agreement }" />
+          <slot name="list-item-content" v-bind="{ agreement }" />
+          <slot v-bind="{ agreement }" />
         </v-list-item-content>
         <v-list-item-action v-if="agreement.text || agreement.link">
           <v-btn @click="openAgreement" icon>

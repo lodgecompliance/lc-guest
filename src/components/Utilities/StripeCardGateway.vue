@@ -11,9 +11,6 @@
             border="left"
             >
                 Unable to initialize gateway right now
-                <div>
-                    <v-btn text @click="initialize">Retry</v-btn>
-                </div>
             </v-alert>
         </data-container>
 

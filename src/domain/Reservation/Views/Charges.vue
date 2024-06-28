@@ -36,22 +36,22 @@
               :header="false"
           />
           <h2 class="headline">Credit Card</h2>
-          <template v-if="checkin.checkin.credit_card">
-            <template v-if="checkin.checkin.credit_card.stripe" >
+          <template v-if="checkin.credit_card">
+            <template v-if="checkin.credit_card.stripe" >
               <stripe-credit-card
-                  v-if="checkin.checkin.credit_card.stripe.card"
-                  :card="checkin.checkin.credit_card.stripe.card">
+                  v-if="checkin.credit_card.stripe.card"
+                  :card="checkin.credit_card.stripe.card">
               </stripe-credit-card>
               <stripe-payment-method
-                  v-if="checkin.checkin.credit_card.stripe.payment_method"
-                  :method="checkin.checkin.credit_card.stripe.payment_method">
+                  v-if="checkin.credit_card.stripe.payment_method"
+                  :method="checkin.credit_card.stripe.payment_method">
               </stripe-payment-method>
             </template>
             <template
-                v-if="checkin.checkin.credit_card.paystack">
+                v-if="checkin.credit_card.paystack">
               <paystack-credit-card
-                  v-if="checkin.checkin.credit_card.paystack"
-                  :card="checkin.checkin.credit_card.paystack">
+                  v-if="checkin.credit_card.paystack"
+                  :card="checkin.credit_card.paystack">
               </paystack-credit-card>
             </template>
           </template>

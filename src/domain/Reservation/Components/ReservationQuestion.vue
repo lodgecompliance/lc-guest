@@ -18,7 +18,7 @@
             <v-date-picker
             v-else-if="question.response_type === 'date'"
             full-width
-            v-model="response" 
+            v-model="response"
             >
             </v-date-picker>
 
@@ -83,7 +83,6 @@ export default {
     methods: {
         responseInput(response) {
             if(!response) return;
-
             this.$emit('response', {
                 ...this.question,
                 response
@@ -103,17 +102,15 @@ export default {
     },
 
     watch: {
-
         response: {
-            handler(response) {
-                this.responseInput(response)
-            }
+          handler(response) {
+            this.responseInput(response)
+          }
         },
-
         question: {
             immediate: true,
-            handler(){
-                this.response = null
+            handler(q){
+                this.response = q.response?.option
             }
         }
     }

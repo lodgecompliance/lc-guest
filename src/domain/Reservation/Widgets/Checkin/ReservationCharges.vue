@@ -65,7 +65,6 @@
                           :payload="props.paymentVariables"
                           :charge="charge"
                           :total="chargeTotal(props.paymentVariables)/100"
-                          :currency="currency"
                           :source-from="`payment-method`"
                           :available-source="submittedStripeSource && submittedStripeSource.payment_method ? submittedStripeSource.payment_method : null"
                           @transaction="newStripeTransaction"
@@ -74,7 +73,7 @@
                           <template #default="{ startPayment, loading: paying }">
                             <v-btn @click="startPayment" :loading="paying" color="primary" depressed small>
                               {{ props.paymentVariables.capture ? 'Pay' : 'Authorize' }}
-                              {{ chargeTotal(props.paymentVariables) | money_value(currency)}}
+                              {{ chargeTotal(props.paymentVariables) | money_value(charge.currency)}}
                             </v-btn>
                           </template>
                         </reservation-stripe-single-payment>
@@ -85,7 +84,6 @@
                             :charge="charge"
                             :payload="props.paymentVariables"
                             :total="chargeTotal(props.paymentVariables)/100"
-                            :currency="currency"
                             :available-authorization="submittedPaystackAuthorization"
                             @credit-card="paystackCreditCardReceived"
                             @transaction="newPaystackTransaction"
@@ -94,7 +92,7 @@
                           <template #default="{ startPayment, loading: paying }">
                             <v-btn @click="startPayment" :loading="paying" color="primary" depressed small>
                               {{ props.paymentVariables.capture ? 'Pay' : 'Authorize' }}
-                              {{ chargeTotal(props.paymentVariables) | money_value(currency)}}
+                              {{ chargeTotal(props.paymentVariables) | money_value(charge.currency)}}
                             </v-btn>
                           </template>
                         </reservation-paystack-single-payment>
@@ -149,8 +147,9 @@ export default {
         allCharges() {
             return this.charges.concat(this.attachments)
         },
+
         currency() {
-            return this.reservation.currency ? this.reservation.currency : this.property.default_currency;
+            return this.reservation.currency ||  this.property.currency;
         },
 
         selectedInstantCharges() {
@@ -245,10 +244,8 @@ export default {
                     title: "Reservation Balance"
                 });
             }
-
             this.charges = this.charges.concat(this.reservation.charges);
             this.getPaidCharges();
-        
         },
 
         getReservationPayments() {

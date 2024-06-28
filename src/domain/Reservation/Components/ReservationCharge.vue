@@ -77,7 +77,7 @@ export default {
 
     computed: {
         currency() {
-            return this.charge.currency ? this.charge.currency : this.property.default_currency;
+            return this.charge.currency ? this.charge.currency : this.property.currency;
         },
 
         isPreAuthorized(){

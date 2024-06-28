@@ -101,10 +101,11 @@ import ProfileAvatar from "@/components/ProfileAvatar.vue";
 import ErrorHandler from "@/components/ErrorHandler.vue";
 import AppMenu from "@/components/AppMenu.vue";
 import HeaderNotifications from "@/components/HeaderNotifications.vue";
+import session from "@/domain/Reservation/Mixins/session";
 
 export default {
   name: 'App',
-  mixins: [update],
+  mixins: [update, session],
   components: {
     HeaderNotifications,
     AppMenu,
@@ -131,7 +132,8 @@ export default {
       'current_page',
       'is_mobile',
       'auth', 'mode',
-      'auth_required'
+      'auth_required',
+      'checkin_session',
     ]),
 
     authUrl() {
@@ -177,7 +179,7 @@ export default {
             }
           })
           .finally(() => {
-              this.bootIntercom();
+            this.bootIntercom();
           })
       },
 

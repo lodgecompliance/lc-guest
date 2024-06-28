@@ -1,5 +1,6 @@
 import moment from "moment";
 import checkinHelper from './checkin';
+
 const dateFormat = 'LL';
 
 const renderValue = value => value ? value : 'N/A';
@@ -84,20 +85,19 @@ const renderQuestions = (reservation, checkin = null) => {
                 if(checkin) {
                     const response = checkinUtil.questionResponse(question);
                     content.push({
-                        text: `Response: ${renderValue(response.option)}`,
+                        text: `Response: ${renderValue(response?.option)}`,
                         ...styles.regular
                     })
-                    if(response.attachments) {
+                    if(response?.attachments) {
                         // Attached agreements
                         if(response.attachments.agreements && response.attachments.agreements.length) {
                             content.push({text: "Attached Agreements", ...styles.regular, bold: true},)
                             content.push({
                                 ol: response.attachments.agreements.map(agreement => {
-                                    let agreementContent = [
+                                    return [
                                         {text: agreement.agreement, ...styles.regular, bold: true},
-                                        {text: renderValue(agreement.text ? agreement.text : agreement.link ), ...styles.regular},
-                                    ]
-                                    return agreementContent;
+                                        {text: renderValue(agreement.text ? agreement.text : agreement.link), ...styles.regular},
+                                    ];
                                 })
                             })
                         }
@@ -205,7 +205,7 @@ const renderIDverification = checkin => {
 
 const renderCreditCard = checkin => {
     let content = [];
-    const creditCard = checkin.checkin.credit_card;
+    const creditCard = checkin.credit_card;
     if(creditCard && creditCard.stripe && creditCard.stripe.card) {
         const card = creditCard.stripe.card;
         content = content.concat([
@@ -232,7 +232,7 @@ const renderCreditCard = checkin => {
 
 const renderSignature = (checkin) => {
     return {
-        image: checkin.checkin.signature,
+        image: checkin.signature,
         width: 200, height: 60
     }
 }

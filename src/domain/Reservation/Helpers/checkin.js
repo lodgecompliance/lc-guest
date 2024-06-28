@@ -1,9 +1,9 @@
 export  default class Checkin {
 
     constructor(checkin = {}) {
-        this.payments = checkin ? checkin.payments : null;
-        this.agreements = checkin && checkin.checkin ? checkin.checkin.agreements : null;
-        this.questions = checkin && checkin.checkin ? checkin.checkin.questions : null;
+        this.payments = checkin?.payments;
+        this.agreements = checkin?.agreements;
+        this.questions = checkin?.questions;
     }
 
     getChargeStripePayment(charge) {
@@ -52,11 +52,11 @@ export  default class Checkin {
     }
 
     agreementAgreed(agreement) {
-        return this.agreements.find(a => a.id === agreement.id)
+        return (this.agreements || []).find(a => a.id === agreement.id)
     }
 
     questionResponse(question) {
-        const questionInCheckin = this.questions.find(q => q.id === question.id);
+        const questionInCheckin = (this.questions || []).find(q => q.id === question.id);
         return questionInCheckin ? questionInCheckin.response : null;
     }
 

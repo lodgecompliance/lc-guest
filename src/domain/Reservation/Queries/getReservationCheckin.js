@@ -4,89 +4,87 @@ export default gql`
     query getReservation($id: ID!){
         getReservation(id: $id){
             checkin {
-               checkin {
-                  checkedin_at
-                  agreements {
-                      id
-                      agreement
-                      link
-                  }
-                  questions {
-                      id
-                      question
-                      response {
-                          option
-                          attachments {
-                              agreements {
-                                  id
-                                  agreement
-                                  link
-                              }
-                              charges {
-                                  id
-                                  type
-                                  title
-                                  amount
-                                  description
-                                  enable
-                                  optional
-                                  currency
-                                  unit
-                                  multipliers {
-                                      min
-                                      max
-                                      unit
-                                  }
-                              }
-                              questions {
-                                  id
-                                  question
-                                  response_type
-                                  required
-                                  options {
-                                      option
-                                  }
-                                  response {
-                                      option
-                                  }
-                              }
-                          }
-                      }
-                  }
-                  credit_card {
-                      stripe {
-                          customer
-                          card {
+              checkedin_at
+              agreements {
+                  id
+                  agreement
+                  link
+              }
+              questions {
+                  id
+                  question
+                  response {
+                      option
+                      attachments {
+                          agreements {
                               id
-                              brand
-                              customer
-                              exp_month
-                              exp_year
-                              last4
-                              name
+                              agreement
+                              link
                           }
-                          payment_method {
+                          charges {
                               id
                               type
-                              card {
-                                  brand
-                                  exp_month
-                                  exp_year
-                                  last4
+                              title
+                              amount
+                              description
+                              enable
+                              optional
+                              currency
+                              unit
+                              multipliers {
+                                  min
+                                  max
+                                  unit
+                              }
+                          }
+                          questions {
+                              id
+                              question
+                              response_type
+                              required
+                              options {
+                                  option
+                              }
+                              response {
+                                  option
                               }
                           }
                       }
-                      paystack {
-                          card_type
-                          authorization_code
+                  }
+              }
+              credit_card {
+                  stripe {
+                      customer
+                      card {
+                          id
+                          brand
+                          customer
                           exp_month
                           exp_year
                           last4
-                          reusable
+                          name
+                      }
+                      payment_method {
+                          id
+                          type
+                          card {
+                              brand
+                              exp_month
+                              exp_year
+                              last4
+                          }
                       }
                   }
-                  signature
-               }
+                  paystack {
+                      card_type
+                      authorization_code
+                      exp_month
+                      exp_year
+                      last4
+                      reusable
+                  }
+              }
+              signature
                user{
                     id
                     email

@@ -109,7 +109,12 @@
                 </section>
                 <section class="my-2">
                   <h4 class="headline">Signature</h4>
-                  <signature-pad :signature="checkin.checkin.signature" :editable="!reservation.already_checkedin" :activate="true" v-model="signature" />
+                  <signature-pad
+                      :signature="checkin.signature"
+                      :editable="!reservation.already_checkedin"
+                      :activate="true"
+                      v-model="signature"
+                  />
                 </section>
 
               <error-handler :error="error" :can-retry="false" />
@@ -141,7 +146,7 @@
     import PaystackCreditCard from '../../../../components/Utilities/PaystackCreditCard.vue';
     import ConverToPdf from '../../../../components/Utilities/convertToPdf.vue';
     import { contract as pdfContent } from '../../Helpers/pdf';
-    import CHECKIN_RESERVATION from '../../Mutations/checkinReservation';
+    import CHECKIN_RESERVATION from '../../Mutations/finalizeReservationCheckin';
     import session from "@/domain/Reservation/Mixins/session";
     import ErrorHandler from "@/components/ErrorHandler.vue";
 
@@ -173,11 +178,11 @@
         computed: {
 
             agreements(){
-                return this.checkin.checkin.agreements
+                return this.checkin.agreements
             },
 
             questions(){
-                return this.checkin.checkin.questions
+                return this.checkin.questions
             },
 
             charges(){
@@ -185,7 +190,7 @@
             },
 
             credit_card() {
-                return this.checkin.checkin.credit_card
+                return this.checkin.credit_card
             },
 
             verification(){
@@ -241,21 +246,14 @@
                     mutation: CHECKIN_RESERVATION,
                     variables: {
                         reservation_id: this.reservation.id,
-                        session_id: this.checkin_session.session.id,
-                        checkin: {
-                            agreements: this.agreements,
-                            questions: this.questions,
-                            credit_card: this.credit_card,
-                            guests: this.guests,
-                            signature: this.signature,
-                        }
-                       
+                        session_id: this.sessionId,
+                        signature: this.signature,
                     }
                 })
                 .then(response => {
-                    if(response.data.checkinReservation){
-                        const reservation = response.data.checkinReservation;
-                        this.$store.commit('ADD_USER_RESERVATION', { ...reservation });
+                    if(response.data.finalizeReservationCheckin){
+                        const reservation = response.data.finalizeReservationCheckin;
+                        // this.$store.commit('ADD_USER_RESERVATION', { ...reservation });
                         this.$emit('checkedin', reservation)
                         this.$store.commit('SNACKBAR', {
                             status: true,

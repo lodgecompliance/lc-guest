@@ -19,8 +19,8 @@
         <reservation-checkin-contract
             ref="contract"
             v-on="$listeners"
-            :reservation="reservation"
             :checkin="checkin"
+            :reservation="reservation"
             :property="property"
             :pdfable="false"
         />
@@ -30,9 +30,11 @@
 
 <script>
 import ReservationCheckinContract from './ReservationCheckinContract.vue'
+import session from "@/domain/Reservation/Mixins/session";
 
 export default {
     name: "ReservationContractSignature",
+    mixins: [session],
     components: {
       ReservationCheckinContract
     },
@@ -43,19 +45,18 @@ export default {
         }
     },
     props: {
-        checkin: Object,
         reservation: Object,
         property: Object,
-        startAgainPath: String,
     },
     computed: {
-        setting() {
-            return this.reservation ? this.reservation.setting : null;  
-        },
+      checkin() {
+        return {
+          checkin: this.checkin_session.memory
+        }
+      },
+      setting() {
+          return this.reservation ? this.reservation.setting : null;
+      },
     },
-
-    watch: {
-
-    }
 }
 </script>

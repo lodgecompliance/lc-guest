@@ -8,7 +8,7 @@
     <v-dialog v-model="dialog" width="350" scrollable>
       <v-card :loading="chargingAuthorization">
         <v-card-title>
-          <h4>Pay {{ total | money(currency) }}</h4>
+          <h4>Pay {{ total | money(charge.currency) }}</h4>
           <v-spacer></v-spacer>
           <v-btn icon @click="dialog = false">
             <v-icon>mdi-close</v-icon>
@@ -64,7 +64,6 @@ export default {
         charge: Object,
         payload: Object,
         total: Number,
-        currency: String,
         availableAuthorization: Object
     },
     data() {
@@ -209,7 +208,7 @@ export default {
             this.$store.commit('SNACKBAR', {
               status: true,
               color: 'success',
-              text: `${this.reservation.currency.toUpperCase()}${transaction.amount/100} paid`
+              text: `${this.charge.currency.toUpperCase()}${transaction.amount/100} paid`
             });
             this.$emit('transaction', transaction);
             this.dialog = false;

@@ -87,6 +87,7 @@ export default gql`
                     email
                     first_name
                     last_name
+                    full_name
                     image
                 }
                 info {
@@ -97,7 +98,7 @@ export default gql`
                     address
                 }
             }
-            charges{
+            charges {
                 id
                 title
                 amount

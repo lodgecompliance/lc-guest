@@ -29,7 +29,7 @@ export default {
     charge() {
       return {
         id: this.request.id,
-        currency: this.reservation.currency,
+        currency: this.reservation.currency || this.property.currency,
         amount: this.request.amount,
         description: this.request.description,
         type: 'instant',

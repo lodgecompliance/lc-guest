@@ -1,14 +1,13 @@
 <template>
-    
     <data-container :loading="loading">
         <h3 class="mb-3">{{ name }}</h3>
         <div v-if="!edit">
             <reservation-guest-info :info="info" />
             <template v-if="fields.length">
-                <v-btn text @click="edit = true" small color="primary"><v-icon>mdi-pencil</v-icon> update</v-btn>
-                <slot name="submit-guest" v-bind="{ submit: () => $emit('submit') }">
-                    <v-btn small text color="primary" @click="$emit('submit')" depressed>Use info</v-btn>
-                </slot>
+                <v-btn text @click="edit = true" small outlined color="primary">
+                  <v-icon small>mdi-pencil</v-icon> update info
+                </v-btn>
+                <slot name="submit-info" v-bind="{ validate }" />
             </template>
             <template v-else>
                 <v-alert
@@ -18,9 +17,6 @@
                     >
                     No other information is required
                 </v-alert>
-                <slot name="submit-guest" v-bind="{ submit: submitInfo }">
-                    <v-btn small text color="primary" @click="submitInfo" depressed>Submit</v-btn>
-                </slot>
             </template>
         </div>
         <div v-else-if="fields.length">
@@ -32,9 +28,7 @@
                     v-model="info[field]"
                     dense
                 />
-                <slot name="submit-guest" v-bind="{ submit: submitInfo }">
-                    <v-btn small color="primary" @click="submitInfo" depressed>Submit</v-btn>
-                </slot>
+              <slot name="submit-info" v-bind="{ validate }" />
             </v-form>
         </div>
     </data-container>
@@ -103,7 +97,7 @@ export default {
             })
         },
 
-      submitInfo() {
+      validate() {
           if(this.$refs.guestInfoForm) {
             if(this.$refs.guestInfoForm.validate()) {
               this.$emit('submit')

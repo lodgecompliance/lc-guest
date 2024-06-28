@@ -48,7 +48,7 @@
                       clearable
                   >
                     <template #selection="{ item: room }">
-                      <span>{{ room.name }} ({{ room.amount | money(property.default_currency) }}) </span>
+                      <span>{{ room.name }} ({{ room.amount | money(property.currency) }}) </span>
                     </template>
                     <template #item="{ item: room, on }">
                       <v-list-item v-on="on" :disabled="!room.available">
@@ -61,7 +61,7 @@
                         </v-list-item-avatar>
                         <v-list-item-content>
                           <v-list-item-title>{{ room.name }}</v-list-item-title>
-                          <v-list-item-subtitle>{{ room.amount | money(property.default_currency) }} </v-list-item-subtitle>
+                          <v-list-item-subtitle>{{ room.amount | money(property.currency) }} </v-list-item-subtitle>
                           <v-list-item-subtitle v-if="!room.available">
                             <small class="red--text">Not Available</small>
                           </v-list-item-subtitle>

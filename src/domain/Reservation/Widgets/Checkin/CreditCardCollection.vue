@@ -1,39 +1,47 @@
 <template>
-    <div>
+    <v-card>
+      <v-card-text>
         <template v-if="gateway">
-            <stripe-credit-card-select
-                v-if="gateway === 'stripe'"
-                :property="property"
-                :reservation="reservation"
-                source="payment-method"
-                @customer="stripeCustomerReceived"
-                @credit-card="stripeCreditCard" 
-            />
+          <stripe-credit-card-select
+              v-if="gateway === 'stripe'"
+              :property="property"
+              :reservation="reservation"
+              source="payment-method"
+              :value="creditCard && creditCard.stripe ? creditCard.stripe : null"
+              @credit-card="stripeCreditCard"
+          />
 
-            <paystack-credit-card-select
-            v-else-if="gateway === 'paystack'"
-            :property="property"
-            :reservation="reservation"
-            :can-create-new="true"
-            @credit-card="paystackCreditCard"
-         />
-           <v-alert v-else
-              colored-border
-              border="top"
-              type="error"
-              >
-              Payment gateway not supported
+          <paystack-credit-card-select
+              v-else-if="gateway === 'paystack'"
+              :property="property"
+              :reservation="reservation"
+              :can-create-new="true"
+              :value="creditCard && creditCard.paystack ? creditCard.paystack : null"
+              @credit-card="paystackCreditCard"
+          />
+          <v-alert v-else
+                   colored-border
+                   border="top"
+                   type="error"
+          >
+            Payment gateway not supported
           </v-alert>
-        
+
         </template>
-        <v-alert v-else 
-        colored-border
-        border="top"
-        type="error"
-            >
-            No payment gateway available
+        <v-alert v-else
+                 colored-border
+                 border="top"
+                 type="error"
+        >
+          No payment gateway available
         </v-alert>
-    </div>
+      </v-card-text>
+      <v-card-actions>
+        <slot v-bind="{ creditCard, submitting, submit }">
+          <v-btn color="primary" :loading="submitting" @click="submit" depressed>Continue</v-btn>
+        </slot>
+      </v-card-actions>
+    </v-card>
 </template>
 
 <script>
@@ -53,7 +61,9 @@ export default {
     },
     data() {
         return {
-            message: null
+            message: null,
+            creditCard: null,
+            submitting: false,
         }
     },
     computed: {
@@ -85,19 +95,43 @@ export default {
 
     methods: {
 
-      stripeCustomerReceived(customer) {
-
-      },
-
       stripeCreditCard(card) {
-          this.$emit('credit-card', {
-            stripe: card.card || card.payment_method ? card : null
-          })
+        this.creditCard = {
+          stripe: card.card || card.payment_method ? card : null
+        }
+        this.$emit('credit-card',this.creditCard )
       },
 
       paystackCreditCard(card) {
-          this.$emit('credit-card', { paystack: card })
+        this.creditCard = { paystack: card }
+        this.$emit('credit-card', this.creditCard )
+      },
+
+      submit() {
+        this.submitting = true;
+        this.submitCreditCard(this.creditCard).then(() => {
+          this.$emit('continue', this.creditCard);
+        }).catch(e => {
+          console.log(e)
+        }).finally(() => {
+          this.submitting = false;
+        })
       }
     },
+  watch: {
+    reservation: {
+      immediate: true,
+      handler() {
+        this.creditCard = this.getCheckinData('credit_card')
+      }
+    },
+    creditCard: {
+      immediate: true,
+      deep: true,
+      handler(cc) {
+        this.$emit('credit-card', cc)
+      }
+    }
+  }
 }
 </script>

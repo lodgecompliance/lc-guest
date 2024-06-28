@@ -39,7 +39,7 @@
                 <h4>Credit card</h4>
               </v-expansion-panel-header>
               <v-expansion-panel-content class="pt-3">
-                <template v-if="checkin.checkin.credit_card">
+                <template v-if="checkin.credit_card">
                   <template v-if="creditCard.stripe" >
                     <stripe-credit-card v-if="creditCard.stripe.card"
                                         :card="creditCard.stripe.card">
@@ -87,7 +87,7 @@
               </v-expansion-panel-header>
               <v-expansion-panel-content class="pt-3">
                 <v-list v-if="questions.length" dense>
-                  <v-list-item v-for="(question, q) in checkin.checkin.questions" :key="q">
+                  <v-list-item v-for="(question, q) in checkin.questions" :key="q">
                     <v-list-item-icon>
                       <v-icon>mdi-account-question</v-icon>
                     </v-list-item-icon>
@@ -297,13 +297,13 @@
 
         computed: {
           agreements() {
-            return this.checkin?.checkin.agreements || []
+            return this.checkin?.agreements || []
           },
           creditCard() {
-            return this.checkin?.checkin.credit_card || {}
+            return this.checkin?.credit_card || {}
           },
           questions() {
-            return this.checkin?.checkin.questions || []
+            return this.checkin?.questions || []
           }
         },
 

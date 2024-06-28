@@ -26,7 +26,6 @@
       </v-card>
   </data-container>
 </template>
-
 <script>
 import gql from "graphql-tag";
 import {mapActions, mapGetters} from "vuex";
@@ -36,7 +35,7 @@ import FilesPreview from "@/components/FilesPreview.vue";
 
 export default {
   name: "ReservationIdVerification",
-  components: {FilesPreview, DataContainer },
+  components: { FilesPreview, DataContainer },
   data(){
     return {
       loading: false,

@@ -8,7 +8,7 @@
       <v-dialog v-model="dialog" width="350" scrollable>
         <v-card :loading="loading">
           <v-card-title>
-            <h4>{{ payload.capture ? 'Pay' : 'Authorize' }} {{ total | money(currency) }}</h4>
+            <h4>{{ payload.capture ? 'Pay' : 'Authorize' }} {{ total | money(charge.currency) }}</h4>
             <v-spacer></v-spacer>
             <v-btn icon @click="dialog = false">
               <v-icon>mdi-close</v-icon>
@@ -74,7 +74,6 @@ export default {
         reservation: Object,
         charge: Object,
         total: Number,
-        currency: String,
         payload: Object,
         availableSource: Object,
         sourceFrom: {

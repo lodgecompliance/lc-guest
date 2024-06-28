@@ -20,10 +20,10 @@
                 </div>
                 <div v-else class="d-flex align-center">
                     <v-avatar color="primary" size="40">
-                        <span class="white--text headline">{{ user.first_name.substring(0,1) }}</span>
+                        <span class="white--text headline">{{ user.first_name || guest.name .substring(0,1) }}</span>
                     </v-avatar>
                     <div class="ml-2">
-                        <h3>{{ [user.first_name, user.last_name].join(' ') }}</h3>
+                        <h3>{{ user.full_name || guest.name }}</h3>
                         <div>
                             <span class="gray--text mr-2">{{ guest.name }}</span>
                             <span v-if="isPrimaryGuest"

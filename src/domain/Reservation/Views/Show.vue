@@ -126,7 +126,7 @@
 </template>
 
 <script>
-import {mapActions, mapGetters, mapMutations} from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 
 import AppLayer from '@/AppLayer';
 import DataContainer from '@/components/DataContainer.vue';
@@ -199,10 +199,10 @@ export default {
     ]),
 
     getStarted() {
-        this.starting = true
-        this.setSession()
-            .then(() => this.start = true)
-            .finally(() => this.starting = false )
+        this.start = true
+        // this.setSession()
+        //     .then(() => this.start = true)
+        //     .finally(() => this.starting = false )
     },
 
     verificationAvailable(verification){
@@ -213,10 +213,10 @@ export default {
 
     },
 
-    reservationCheckedin(){
+    reservationCheckedin(checkin){
       this.getReservation();
       if(window.top) {
-        window.top.postMessage({ type: "checkedin" }, "*");
+        window.top.postMessage({ type: "checkedin", data: checkin }, "*");
       }
     },
 
