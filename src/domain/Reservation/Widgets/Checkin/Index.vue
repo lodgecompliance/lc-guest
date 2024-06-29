@@ -4,7 +4,7 @@
         <p>Kindly complete your checkin process</p>
         <data-container :loading="loading">
           <template v-if="canStart" >
-            <responsive-stepper flat @change="stepChanged" :step="currentStep" style="box-shadow: none">
+            <responsive-stepper flat non-linear @change="stepChanged" :step="currentStep" style="box-shadow: none">
               <template v-for="(step, i) in steps">
                 <!-- ID verification -->
                 <template v-if="step.id === 'id-verification'">

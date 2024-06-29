@@ -50,9 +50,7 @@ export default {
     },
     computed: {
       checkin() {
-        return {
-          checkin: this.checkin_session.memory
-        }
+        return this.checkin_session.memory
       },
       setting() {
           return this.reservation ? this.reservation.setting : null;

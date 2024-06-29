@@ -1,6 +1,11 @@
 <template>
     <div v-if="method">
-        <stripe-credit-card v-if="method.type === 'card' && method.card" v-bind="$attrs" :card="method.card">
+        <stripe-credit-card
+            v-if="method.type === 'card' && method.card"
+            v-bind="$attrs"
+            v-on="$listeners"
+            :card="method.card"
+        >
             <template #actions>
                 <slot name="actions" v-bind="{ method }" />
             </template>

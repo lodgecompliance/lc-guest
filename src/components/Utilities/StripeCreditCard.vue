@@ -1,6 +1,6 @@
 <template>
 <div>
-    <v-card v-bind="$attrs" v-if="card" outlined>
+    <v-card v-bind="$attrs" v-on="$listeners" v-if="card" outlined>
     <v-card-title>
         <h4> **** **** **** {{ card.last4 }}</h4>
         <v-spacer></v-spacer>

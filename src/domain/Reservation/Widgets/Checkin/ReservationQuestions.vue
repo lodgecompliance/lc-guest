@@ -31,7 +31,7 @@
           <v-form ref="form">
             <reservation-question
                 outlined
-                v-for="question  in normalizedResponses" :key="question.id"
+                v-for="question  in questions" :key="question.id"
                 :question="question"
                 @response="responded"
                 class="my-2"
@@ -73,12 +73,11 @@ export default {
       questions() {
         return (this.reservation?.questions || []).map(q => ({
           ...q,
-          response: null
+          response: this.normalizedResponses.find(rq => q.id === rq.id)?.response
         }))
       },
 
       normalizedResponses() {
-        if(!this.responses) return [];
         return this.responses.map(question => {
           const response = typeof(question.response) === 'string'
               ? {
@@ -116,10 +115,16 @@ export default {
       reservation: {
         immediate: true,
         handler(r) {
-          this.responses = this.getCheckinData('questions') || this.questions;
+          const answered = this.getCheckinData('questions') || []
+          this.responses = this.questions.map(q => {
+            return {
+              ...q,
+              response: answered.find(a => a.id === q.id)?.response
+            }
+          });
         }
       },
-      normalizedResponses: {
+      questions: {
         immediate: true,
         deep: true,
         handler(q) {

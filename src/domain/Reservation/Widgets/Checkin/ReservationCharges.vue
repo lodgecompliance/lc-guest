@@ -209,6 +209,10 @@ export default {
                 }
             }
         },
+        _charges: {
+          type: Array,
+          default: () => []
+        },
         fetchPayments: {
             type: Boolean,
             default: () => false
@@ -260,6 +264,7 @@ export default {
             .then(response => {
                 if(response.data.getReservationPayments) {
                     this.payments = response.data.getReservationPayments;
+                    this.setCheckinData('payments', this.payments)
                     this.getPaidCharges();
                 }
             })

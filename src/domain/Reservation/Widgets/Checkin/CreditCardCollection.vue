@@ -6,8 +6,8 @@
               v-if="gateway === 'stripe'"
               :property="property"
               :reservation="reservation"
-              source="payment-method"
-              :value="creditCard && creditCard.stripe ? creditCard.stripe : null"
+              :source="stripeSource"
+              :value="stripeCardValue"
               @credit-card="stripeCreditCard"
           />
 
@@ -16,7 +16,7 @@
               :property="property"
               :reservation="reservation"
               :can-create-new="true"
-              :value="creditCard && creditCard.paystack ? creditCard.paystack : null"
+              :value="paystackCardValue"
               @credit-card="paystackCreditCard"
           />
           <v-alert v-else
@@ -48,6 +48,7 @@
 import StripeCreditCardSelect from '../../Components/Payment/StripeCreditCardSelect.vue';
 import PaystackCreditCardSelect from '../../Components/Payment/PaystackCreditCardSelect.vue';
 import session from "@/domain/Reservation/Mixins/session";
+import {mapGetters} from "vuex";
 
 export default {
     name: "ReservationCheckinCreditCard",
@@ -67,9 +68,22 @@ export default {
         }
     },
     computed: {
+      ...mapGetters(['checkin_session']),
         gateway() {
             return this.reservation && this.reservation.setting &&  this.reservation.setting.payment_gateway
             ?  this.reservation.setting.payment_gateway : null;
+        },
+        stripeSource() {
+          return 'payment-method';
+        },
+        stripeCardValue() {
+          return {
+            'card': this.creditCard?.stripe?.card,
+            'payment-method': this.creditCard?.stripe?.payment_method,
+          }[this.stripeSource]
+        },
+        paystackCardValue() {
+          return this.creditCard?.paystack
         },
         paystackCharge() {
             const variables = {
@@ -90,7 +104,7 @@ export default {
                 variables.receipt_email = this.$store.getters.current_user.auth.email
             }
             return variables;
-        }
+        },
     },
 
     methods: {
@@ -119,10 +133,15 @@ export default {
       }
     },
   watch: {
-    reservation: {
+    checkin_session: {
       immediate: true,
+      deep: true,
       handler() {
-        this.creditCard = this.getCheckinData('credit_card')
+        const saved = this.getCheckinData('credit_card');
+        this.creditCard = {
+          stripe: saved?.stripe,
+          paystack: saved?.paystack
+        }
       }
     },
     creditCard: {

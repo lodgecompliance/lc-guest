@@ -8,30 +8,46 @@
               <div class="grey--text text-center">
                 <small>Your authorized card at {{ property.name }} </small>
               </div>
-                <v-radio-group 
-                    v-model="creditCard" 
-                    :rules="[(value) => !value && !addCard  ? 'Select a credit card' : true]"
-                    :disabled="disableCardSelect"
-                    dense
-                    >
-                        <v-radio
-                            v-for="(card, c) in cards" :key="c"
-                            :value="card"
-                        >
-                            <template #label>
-                                <div class="pr-2" style="width: 100%">
-                                    <stripe-credit-card class="my-1" :card="card">
-                                        <template #actions="attr">
-                                            <v-spacer></v-spacer>
-                                            <v-btn icon @click="confirmCardRemoval(attr.card)">
-                                                <v-icon small color="red">mdi-delete</v-icon>
-                                            </v-btn>
-                                        </template>
-                                    </stripe-credit-card>
-                                </div>
-                            </template>
-                        </v-radio>
-                    </v-radio-group>
+              <stripe-credit-card
+                  v-for="(card, c) in cards"
+                  :key="c"
+                  class="my-1"
+                  :card="card"
+                  :dark="card.id === creditCard.id"
+                  :color="`${card.id === creditCard.id ? 'primary' : ''}`"
+                  @click="creditCard = card"
+              >
+                <template #actions="attr">
+                  <v-spacer></v-spacer>
+                  <v-btn icon @click="confirmCardRemoval(attr.card)">
+                    <v-icon small color="red">mdi-delete</v-icon>
+                  </v-btn>
+                </template>
+              </stripe-credit-card>
+<!--                <v-radio-group -->
+<!--                    v-model="creditCard" -->
+<!--                    :rules="[(v) => !v && !addCard  ? 'Select a card' : true]"-->
+<!--                    :disabled="disableCardSelect"-->
+<!--                    dense-->
+<!--                    >-->
+<!--                        <v-radio-->
+<!--                            v-for="(card, c) in cards" :key="c"-->
+<!--                            :value="card"-->
+<!--                        >-->
+<!--                            <template #label>-->
+<!--                                <div class="pr-2" style="width: 100%">-->
+<!--                                    <stripe-credit-card class="my-1" :card="card">-->
+<!--                                        <template #actions="attr">-->
+<!--                                            <v-spacer></v-spacer>-->
+<!--                                            <v-btn icon @click="confirmCardRemoval(attr.card)">-->
+<!--                                                <v-icon small color="red">mdi-delete</v-icon>-->
+<!--                                            </v-btn>-->
+<!--                                        </template>-->
+<!--                                    </stripe-credit-card>-->
+<!--                                </div>-->
+<!--                            </template>-->
+<!--                        </v-radio>-->
+<!--                    </v-radio-group>-->
                 <div class="text-center">
                   <a href="#" @click.prevent="addCard = true">Use another card </a>
                 </div>
@@ -40,28 +56,50 @@
               <div class="grey--text text-center">
                 <small>Your authorized card at {{ property.name }} </small>
               </div>
-              <v-radio-group
-                  v-model="paymentMethod"
-                  :rules="[(value) => !value ? 'Select a credit card' : true]"
-                  >
-                      <v-radio
-                          v-for="(method, m) in paymentMethods" :key="m"
-                          :value="method"
-                      >
-                          <template #label>
-                              <div class="pr-2" style="width: 100%">
-                                  <stripe-payment-method class="my-1" :method="method" >
-                                      <template #actions="attr">
-                                          <v-spacer></v-spacer>
-                                          <v-btn icon @click="confirmPaymentMethodRemoval(attr.method)">
-                                              <v-icon small color="red">mdi-delete</v-icon>
-                                          </v-btn>
-                                      </template>
-                                  </stripe-payment-method>
-                              </div>
-                          </template>
-                      </v-radio>
-                  </v-radio-group>
+
+              <stripe-payment-method
+                  v-for="(method, m) in paymentMethods"
+                  :key="m"
+                  class="my-1"
+                  :dark="method.id === paymentMethod.id"
+                  :color="`${method.id === paymentMethod.id ? 'primary' : ''}`"
+                  :method="method"
+                  @click="paymentMethod = method"
+              >
+                <template #actions="{ method }">
+                  <v-spacer></v-spacer>
+                  <v-btn icon @click="confirmPaymentMethodRemoval(method)">
+                    <v-icon small color="red">mdi-delete</v-icon>
+                  </v-btn>
+                </template>
+              </stripe-payment-method>
+
+<!--              <v-radio-group-->
+<!--                  v-model="paymentMethod"-->
+<!--                  :rules="[(v) => !v ? 'Select a card' : true]"-->
+<!--                  >-->
+<!--                      <v-radio-->
+<!--                          v-for="(method, m) in paymentMethods"-->
+<!--                          :key="m"-->
+<!--                          :value="method"-->
+<!--                      >-->
+<!--                          <template #label>-->
+<!--                              <div class="pr-2" style="width: 100%">-->
+<!--                                  <stripe-payment-method-->
+<!--                                      class="my-1"-->
+<!--                                      :method="method"-->
+<!--                                  >-->
+<!--                                      <template #actions="{ method }">-->
+<!--                                          <v-spacer></v-spacer>-->
+<!--                                          <v-btn icon @click="confirmPaymentMethodRemoval(method)">-->
+<!--                                              <v-icon small color="red">mdi-delete</v-icon>-->
+<!--                                          </v-btn>-->
+<!--                                      </template>-->
+<!--                                  </stripe-payment-method>-->
+<!--                              </div>-->
+<!--                          </template>-->
+<!--                      </v-radio>-->
+<!--                  </v-radio-group>-->
               <div class="text-center">
                     <v-btn
                         text color="primary" small
@@ -69,9 +107,10 @@
                     </v-btn>
                   </div>
             </div>
+
             <error-handler :error="error" :can-retry="false" />
 
-          <div v-if="addCard">
+            <div v-if="addCard">
                 <stripe-new-credit-card
                     v-if="type === 'confirm-setup'"
                     ref="stripeCreditCard" 
@@ -294,12 +333,10 @@ export default {
           })
           .then(() => {
               if(this.source === 'card') {
-                  if(!this.cards.length) this.addCard = true;
-                  else this.creditCard = this.cards[this.cards.length - 1];
+                if(!this.cards.length) this.addCard = true;
               }
               if(this.source === 'payment-method') {
-                  if(!this.paymentMethods.length) this.addCard = true;
-                  else this.paymentMethod = this.paymentMethods[this.paymentMethods.length - 1];
+                if(!this.paymentMethods.length) this.addCard = true;
               }
           })
           .catch(e => this.error = e)
@@ -624,19 +661,20 @@ export default {
       },
 
     },
-
-    mounted() {
-      if (this.value) {
-        if (this.source === 'card') this.creditCard = this.value;
-        if (this.source === 'payment-method') this.paymentMethod = this.value;
-      }
-    },
  
     watch: {
         reservation: {
             immediate: true,
             handler(reservation){
                 if(reservation) this.getPropertyCustomer()
+            }
+        },
+
+        value: {
+            immediate: true,
+            handler(card) {
+              if (this.source === 'card') this.creditCard = card;
+              if (this.source === 'payment-method') this.paymentMethod = card;
             }
         },
 
