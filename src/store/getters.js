@@ -1,6 +1,7 @@
 const getters = {
     auth: state => state.auth,
     auth_required: state => state.auth_required,
+    auth_params: state => state.auth_params,
     mode: state => state.mode,
     app_ready: state => state.app_ready,
     app_process: state => state.app_process,

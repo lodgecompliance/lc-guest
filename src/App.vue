@@ -71,7 +71,7 @@
     <v-footer v-if="app_layout === 'full'" app>
       <a
           v-if="auth.profile"
-          class="d-flex align-center" style="cursor: pointer"
+          class="d-flex align-center text-decoration-none" style="cursor: pointer"
           :href="authDomain"
           target="_blank"
           >
@@ -81,11 +81,8 @@
       <v-spacer></v-spacer>
       <v-btn x-small @click="updateApp" title="Reload app" icon><v-icon>mdi-refresh</v-icon></v-btn>
     </v-footer>
-    <div :class="`auth-frame-container ${auth_required ? 'authenticate' : ''}`">
-      <iframe
-          id="authFrame"
-          :src="authUrl"
-      ></iframe>
+    <div v-if="auth_required" :class="`auth-frame-container authenticate`">
+      <iframe id="authFrame" :src="authUrl"></iframe>
     </div>
   </v-app>
 </template>
@@ -103,6 +100,7 @@ import AppMenu from "@/components/AppMenu.vue";
 import HeaderNotifications from "@/components/HeaderNotifications.vue";
 import session from "@/domain/Reservation/Mixins/session";
 import moment from "moment";
+import querystring from "querystring";
 
 export default {
   name: 'App',
@@ -134,11 +132,12 @@ export default {
       'is_mobile',
       'auth', 'mode',
       'auth_required',
+      'auth_params',
       'checkin_session',
     ]),
 
     authUrl() {
-      return `${this.authDomain}/auth`;
+      return `${this.authDomain}/auth?${querystring.stringify(this.auth_params)}`;
     }
   },
 
@@ -200,12 +199,12 @@ export default {
         this.SET_APP_STATE(false)
         this.signout()
         .then(() => {
-            this.$intercom?.shutdown()
+          this.$intercom?.shutdown();
+          this.signedOut();
         }).finally(() => {
           this.SET_APP_STATE(true);
         })
       },
-
     },
 
     mounted() {
@@ -249,7 +248,6 @@ export default {
                 }
                 else if(status === 'signedout') {
                   vm.signedOut();
-                  vm.SET_AUTH_REQUIRED(!!vm.$route.meta.requiresAuth);
                 }
                 break;
               case "view-account":

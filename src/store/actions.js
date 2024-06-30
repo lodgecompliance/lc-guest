@@ -125,26 +125,18 @@ const actions = {
             .then(() => dispatch('getAuthGrProfile'))
     },
 
-    signout({dispatch, commit}){
-       return new Promise((resolve) => {
-           dispatch('postToAuth', { type: 'signout' })
-           dispatch('signedOut')
-           resolve()
-       })
+    signedOut(){
+        window.location.replace(`${config.app.authDomain}/signout?redirect=${window.location.href}`)
     },
 
-    signedOut({ commit }){
-        commit('UNSET_CURRENT_USER');
-        commit('SET_AUTH', { token: null, profile: null });
-        commit('SET_MODE', null)
+    signout({ commit }){
+        return new Promise(resolve => {
+            commit('UNSET_CURRENT_USER');
+            commit('SET_AUTH', { token: null, profile: null });
+            commit('SET_MODE', null);
+            resolve();
+        })
     },
-
-    postToAuth({ commit }, data) {
-        let iframeEl = document.getElementById("authFrame");
-        if(iframeEl) {
-            iframeEl.contentWindow.postMessage(data, config.app.authDomain);
-        }
-    }
 }
 
 export default actions

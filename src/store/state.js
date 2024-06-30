@@ -8,6 +8,7 @@ const state = {
     },
     mode: 'application',
     auth_required: false,
+    auth_params: {},
     current_user: {
         auth: null,
         profile: null,

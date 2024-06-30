@@ -20,6 +20,10 @@ const mutations = {
         state.auth = auth
     },
 
+    SET_AUTH_PARAM: (state, { key, value }) => {
+        state.auth_params[key] = value
+    },
+
     SET_AUTH_REQUIRED: (state, required) => {
         state.auth_required = required
     },

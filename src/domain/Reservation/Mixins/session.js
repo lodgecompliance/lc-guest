@@ -193,7 +193,7 @@ export default {
                 }).then(() => {
                     return this.$router.replace({
                         ...this.$route,
-                        query: { ...this.$route.query, session: this.checkin_session.session.id, start: 1 }
+                        query: { ...this.$route.query, session: this.checkin_session.session.id }
                     })
                 })
                 .catch(e => resolve())

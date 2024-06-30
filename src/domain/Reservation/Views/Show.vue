@@ -177,7 +177,7 @@ export default {
       },
 
       canStart() {
-          return this.start || this.$route.query.start == 1
+          return this.$route.query.start == 1
       },
 
       startPath() {
@@ -195,14 +195,15 @@ export default {
     ...mapMutations([
       'SET_CURRENT_PROPERTY',
       'SET_CHECKIN_SESSION_RESERVATION',
-      'SET_AUTH_REQUIRED'
+      'SET_AUTH_REQUIRED',
+      'SET_AUTH_PARAM'
     ]),
 
     getStarted() {
-        this.start = true
-        // this.setSession()
-        //     .then(() => this.start = true)
-        //     .finally(() => this.starting = false )
+      return this.$router.replace({
+        ...this.$route,
+        query: { ...this.$route.query, start: 1 }
+      })
     },
 
     verificationAvailable(verification){
@@ -255,6 +256,15 @@ export default {
       immediate: true,
       handler() {
         this.getReservation()
+      }
+    },
+    reservation: {
+      immediate: true,
+      handler(r) {
+        if(!r) return;
+        this.SET_AUTH_PARAM({ key:  'idVerification', value: r.require_id_verification ? 1 : 0 })
+        this.SET_AUTH_PARAM({ key:  'reservationId', value: r.id })
+        this.SET_AUTH_PARAM({ key: 'referer', value: this.url(this.startPath) })
       }
     }
   }
