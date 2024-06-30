@@ -4,7 +4,6 @@ const state = {
     app_process: '',
     auth: {
         token: null,
-        expires: null,
         profile: null,
     },
     mode: 'application',

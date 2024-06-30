@@ -169,7 +169,7 @@ export default {
           'authenticated',
           'current_user',
           'profile_loaded',
-          'checkin',
+          'auth',
       ]),
 
       id(){
@@ -238,7 +238,6 @@ export default {
           if(this.reservation) {
             this.SET_CHECKIN_SESSION_RESERVATION(response.data.getReservation);
             this.SET_CURRENT_PROPERTY(this.reservation.property);
-            if(this.canStart) return this.setSession()
           }
         })
         .catch(e => this.error = e)
@@ -246,6 +245,12 @@ export default {
     },
   },
   watch: {
+    current_user: {
+      immediate: true,
+      handler(user) {
+        if(user.auth?.uid && this.canStart) this.setSession();
+      }
+    },
     id: {
       immediate: true,
       handler() {

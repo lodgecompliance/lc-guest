@@ -147,6 +147,7 @@ export default {
           'syncAuthUser',
           'getSystemParams',
           'signout',
+          'signedOut',
           'query',
           'mutate'
       ]),
@@ -155,7 +156,6 @@ export default {
           'SET_AUTH',
           'SET_AUTH_REQUIRED',
           'SET_APP_STATE',
-          'SET_USER_AUTH',
           'SNACKBAR',
           'UNSET_CURRENT_USER',
           'SET_APP_LAYOUT',
@@ -184,12 +184,12 @@ export default {
       },
 
       bootIntercom() {
-        if(config.intercom.app_id && this.current_user.auth) {
+        if(config.intercom.app_id && this.auth?.profile) {
           this.$intercom.boot({
-            user_id: this.current_user.auth.uid,
-            name: [this.current_user.profile.first_name, this.current_user.profile.last_name].join(' '),
-            email: this.current_user.profile.email,
-            user_hash: CryptoJS.HmacSHA256(this.current_user.auth.uid, config.intercom.secret_key).toString(),
+            user_id: this.auth.profile.id,
+            name: this.auth.profile.full_name,
+            email: this.auth.profile.email,
+            user_hash: CryptoJS.HmacSHA256(this.auth.profile.id, config.intercom.secret_key).toString(),
             hide_default_launcher: false
           })
         }
@@ -199,7 +199,7 @@ export default {
         this.SET_APP_STATE(false)
         this.signout()
         .then(() => {
-            this.$intercom.shutdown()
+            this.$intercom?.shutdown()
         }).finally(() => {
           this.SET_APP_STATE(true);
         })
@@ -237,21 +237,17 @@ export default {
         })
         window.addEventListener('message', function(message) {
           if (message.origin === config.app.authDomain) {
-            let { type, token, expires, profile, status } = message.data;
+            let { type, token, profile, status } = message.data;
             switch (type) {
               case "auth":
                 if(status === 'signedin') {
-                  vm.SET_AUTH({ token, expires, profile })
-                  vm.SET_AUTH_REQUIRED(!(token && expires && profile));
+                  vm.SET_AUTH({ token, profile })
+                  vm.SET_AUTH_REQUIRED(!(token && profile));
                   vm.setUser()
                 }
                 else if(status === 'signedout') {
-                  vm.SET_AUTH({ token: null, expires: null, profile: null })
-                  vm.SET_MODE(null)
-                  vm.UNSET_CURRENT_USER()
-                  if(vm.$route.meta.requiresAuth) {
-                    vm.SET_AUTH_REQUIRED(true);
-                  }
+                  vm.signedOut();
+                  vm.SET_AUTH_REQUIRED(!!vm.$route.meta.requiresAuth);
                 }
                 break;
               case "view-account":
@@ -272,9 +268,9 @@ export default {
               ? 'sdk' : 'application'
           )
           this.SET_APP_LAYOUT(this.mode === 'sdk' ? 'plain' : route.meta.layout || 'full');
-          if(route.meta.requiresAuth && !this.authenticated) {
-            this.SET_AUTH_REQUIRED(true);
-          } else this.SET_APP_STATE(true)
+          const authRequired = route.meta.requiresAuth && !this.authenticated;
+          if(authRequired) this.SET_AUTH_REQUIRED(true)
+          else this.SET_APP_STATE(true);
         }
       }
     }

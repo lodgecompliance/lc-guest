@@ -202,7 +202,7 @@ export default {
           variables: {
             ...this.payload,
             source: this.source.id,
-            customer: this.customerInfo.id
+            customer: this.customerInfo?.id
           }
         }).then(response => {
           this.intent = response.data.createReservationPaymentIntent;
@@ -358,15 +358,18 @@ export default {
           });
       }
   },
-  mounted() {
-     const customer = this.getCheckinData("stripe_customer");
-     if(customer) this.customerReceived(customer);
-  },
   watch: {
     availableSource: {
       immediate: true,
       handler(source) {
         if(source) this.source = source
+      }
+    },
+    checkin_session: {
+      deep: true,
+      handler() {
+        const customer = this.getCheckinData("stripe_customer");
+        if(customer) this.customerReceived(customer);
       }
     }
   }

@@ -1,6 +1,6 @@
 <template>
     <data-container :loading="loading">
-      <v-card>
+      <v-card flat>
         <v-card-text>
           <template v-if="reservation.allow_additional_guest">
             <h4 class="text-h6">Are you staying at the reservation?</h4>
@@ -174,7 +174,10 @@ export default {
           immediate: true,
           handler() {
             this.guests = this.getCheckinData('guests') || [];
-            if(!this.guests.find(g => g.user_id === this.current_user.profile.id)) {
+            if(
+                this.reservation.allow_additional_guest
+                && !this.guests.find(g => g.user_id === this.current_user.profile.id)
+            ) {
               this.staying = false;
             }
           }

@@ -1,116 +1,104 @@
 <template>
     <section>
-        <h4 class="my-2">Checkin</h4>
-        <p>Kindly complete your checkin process</p>
-        <data-container :loading="loading">
-          <template v-if="canStart" >
-            <responsive-stepper flat non-linear @change="stepChanged" :step="currentStep" style="box-shadow: none">
-              <template v-for="(step, i) in steps">
-                <!-- ID verification -->
-                <template v-if="step.id === 'id-verification'">
-                  <v-stepper-step
-                      :key="`step-${step.id}`"
-                      :complete="verificationSubmitted"
-                      :step="(i+1)"
-                      :editable="currentStep >= (i+1)"
-                      edit-icon="mdi-account-check"
-                  >
-                    ID Verification
-                  </v-stepper-step>
-                  <v-stepper-content
-                      :key="`step-content-${step.id}`"
-                      :step="(i+1)"
-                      class="px-1 mr-1"
-                  >
-                    <div class="pa-1">
-                      <reservation-id-verification
-                          :user-id="current_user.profile.id"
-                          @verification="(v) => verification = v"
-                      >
-                        <template #default="{ loading, verification }">
-                          <v-card-text v-if="verification">
-                            Your ID verification will be shared with {{ property.name }}
-                          </v-card-text>
-                          <v-card-actions>
-                            <v-btn color="primary" @click="currentStep++" :disabled="loading" depressed>Continue</v-btn>
-                          </v-card-actions>
-                        </template>
-                      </reservation-id-verification>
-                    </div>
-                  </v-stepper-content>
-                </template>
+      <h4 class="my-2">Checkin</h4>
+      <p>Kindly complete your checkin process</p>
+        <template v-if="canStart" >
+          <responsive-stepper flat non-linear @change="stepChanged" :step="currentStep" style="box-shadow: none">
+            <template v-for="(step, i) in steps">
 
-                <!-- Guest -->
-                <template v-if="step.id === 'guest'">
-                  <v-stepper-step
-                      :key="`step-${step.id}`"
-                      :step="(i+1)"
-                      :complete="guestsAvailable"
-                      :editable="currentStep >= (i+1)"
-                      edit-icon="mdi-account-group"
-                  >
-                    Guests
-                  </v-stepper-step>
-                  <v-stepper-content
-                      :key="`step-content-${step.id}`"
-                      :step="(i+1)"
-                      class="px-1 mr-1"
-                  >
-                    <reservation-guest
-                        :property="property"
-                        :reservation="reservation"
-                        @guests="g => guests = g"
-                        @continue="currentStep++"
-                    />
-                  </v-stepper-content>
-                </template>
+              <template>
+                <v-stepper-step
+                    :key="`step-${step.id}`"
+                    :complete="step.completed"
+                    :step="(i+1)"
+                    :editable="currentStep >= (i+1)"
+                    edit-icon="mdi-account-check"
+                >
+                  {{ step.name }}
+                </v-stepper-step>
+              </template>
 
-                <!-- Questions -->
-                <template v-if="step.id === 'questions'">
-                  <v-stepper-step
-                      :key="`step-${step.id}`"
-                      :complete="questionsRespondedTo"
-                      :step="(i+1)"
-                      :editable="currentStep >= (i+1)"
-                      edit-icon="mdi-account-question"
-                  >
-                    Questions
-                  </v-stepper-step>
-                  <v-stepper-content
-                      :key="`step-content-${step.id}`"
-                      :step="(i+1)"
-                      class="px-1 mr-1"
-                  >
-                    <reservation-questions
-                        :reservation="reservation"
-                        @questions="q => questions = q"
-                        @continue="currentStep++"
-                    />
-                  </v-stepper-content>
-                </template>
+              <template>
+                <v-stepper-content
+                    :key="`step-content-${step.id}`"
+                    :step="(i+1)"
+                    class="px-1 mr-1"
+                >
+                  <div class="pa-1">
 
-                <!-- Agreements -->
-                <template v-if="step.id === 'agreements'">
-                  <v-stepper-step
-                      :key="`step-${step.id}`"
-                      :complete="agreementsAgreed"
-                      :step="(i+1)"
-                      :editable="currentStep >= (i+1)"
-                      edit-icon="mdi-handshake"
-                  >
-                    Agreements
-                  </v-stepper-step>
-                  <v-stepper-content
-                      :key="`step-content-${step.id}`"
-                      :step="(i+1)"
-                      class="px-1 mr-1"
-                  >
-                    <reservation-agreements
-                        :reservation="reservation"
-                        :additional-agreements="additionalAgreements"
-                        @agreements="a => agreements = a"
-                        @continue="currentStep++"
+                    <!-- ID verification -->
+                    <reservation-id-verification v-if="step.id === 'id-verification'"
+                                                 :user-id="current_user.profile.id"
+                                                 @verification="(v) => verification = v"
                     >
+                      <template #default="{ loading, verification }">
+                        <v-card-text v-if="verification">
+                          Your ID verification will be shared with {{ property.name }}
+                        </v-card-text>
+                        <checkin-step-nav
+                            :current-step="steps[i]"
+                            :prev-step="prevStep"
+                            :next-step="nextStep"
+                            :submit="() => currentStep++"
+                            @back="currentStep--"
+                        />
+                      </template>
+                    </reservation-id-verification>
+
+                    <!-- Guest -->
+                    <reservation-guest v-if="step.id === 'guest'"
+                                       :property="property"
+                                       :reservation="reservation"
+                                       @guests="g => guests = g"
+                                       @continue="currentStep++"
+                    >
+                      <template #default="{ submitting, submit }">
+                        <checkin-step-nav
+                            :current-step="steps[i]"
+                            :prev-step="prevStep"
+                            :next-step="nextStep"
+                            :submit="submit"
+                            :loading="submitting"
+                            @back="currentStep--"
+                        />
+                      </template>
+                    </reservation-guest>
+
+                    <!-- Questions -->
+                    <reservation-questions v-if="step.id === 'questions'"
+                                           :reservation="reservation"
+                                           @questions="q => questions = q"
+                                           @continue="currentStep++"
+                    >
+                      <template #default="{ submitting, submit }">
+                        <checkin-step-nav
+                            :current-step="steps[i]"
+                            :prev-step="prevStep"
+                            :next-step="nextStep"
+                            :submit="submit"
+                            :loading="submitting"
+                            @back="currentStep--"
+                        />
+                      </template>
+                    </reservation-questions>
+
+                    <!-- Agreements -->
+                    <reservation-agreements v-if="step.id === 'agreements'"
+                                            :reservation="reservation"
+                                            :additional-agreements="additionalAgreements"
+                                            @agreements="a => agreements = a"
+                                            @continue="currentStep++"
+                    >
+                      <template #default="{ submitting, submit }">
+                        <checkin-step-nav
+                            :current-step="steps[i]"
+                            :prev-step="prevStep"
+                            :next-step="nextStep"
+                            :submit="submit"
+                            :loading="submitting"
+                            @back="currentStep--"
+                        />
+                      </template>
                       <template #note="{ agreement }">
                         <v-alert v-if="agreement.question"
                                  border="left"
@@ -121,99 +109,78 @@
                         </v-alert>
                       </template>
                     </reservation-agreements>
-                  </v-stepper-content>
-                </template>
 
-                <!-- Payment -->
-                <template  v-if="step.id === 'payment'">
-                  <v-stepper-step
-                      :key="`step-${step.id}`"
-                      :step="(i+1)"
-                      :complete="allPaymentMade"
-                      :editable="currentStep >= (i+1)"
-                      edit-icon="mdi-credit-card"
-                  >
-                    Payment
-                  </v-stepper-step>
-                  <v-stepper-content
-                      :key="`step-content-${step.id}`"
-                      :step="(i+1)"
-                      class="px-1 mr-1 py-0"
-                  >
-                    <reservation-checkin-payments
-                        :property="property"
-                        :reservation="reservation"
-                        :credit-card="credit_card"
-                        :extra-charges="attachedCharges"
-                        :capture-pre-authorize="capturePreAuthorize"
-                        @charges="c => charges = c"
-                        @credit-card="cc => credit_card = cc"
-                        @continue="currentStep++"
-                    />
-                  </v-stepper-content>
-                </template>
+                    <!-- Credit card -->
+                    <reservation-checkin-credit-card v-if="step.id === 'credit-card'"
+                                                     :reservation="reservation"
+                                                     :property="property"
+                                                     @credit-card="cc => credit_card = cc"
+                                                     @continue="currentStep++"
+                    >
+                      <template #default="{ submitting, submit }">
+                        <checkin-step-nav
+                            :current-step="steps[i]"
+                            :prev-step="prevStep"
+                            :next-step="nextStep"
+                            :submit="submit"
+                            :loading="submitting"
+                            @back="currentStep--"
+                        />
+                      </template>
+                    </reservation-checkin-credit-card>
 
-                <!-- Credit card -->
-                <template  v-if="step.id === 'credit-card'">
-                  <v-stepper-step
-                      :key="`step-${step.id}`"
-                      :step="(i+1)"
-                      :complete="creditCardCollected"
-                      :editable="currentStep >= (i+1)"
-                      edit-icon="mdi-credit-card"
-                  >
-                    Credit Card
-                  </v-stepper-step>
-                  <v-stepper-content
-                      :key="`step-content-${step.id}`"
-                      :step="(i+1)"
-                      class="px-1 mr-1"
-                  >
-                    <reservation-checkin-credit-card
-                        :reservation="reservation"
-                        :property="property"
-                        @credit-card="cc => credit_card = cc"
-                        @continue="currentStep++"
-                    />
-                  </v-stepper-content>
-                </template>
+                    <!-- Payment -->
+                    <reservation-checkin-payments v-if="step.id === 'payment'"
+                                                  :property="property"
+                                                  :reservation="reservation"
+                                                  :credit-card="credit_card"
+                                                  :extra-charges="attachedCharges"
+                                                  :capture-pre-authorize="capturePreAuthorize"
+                                                  @charges="c => charges = c"
+                                                  @credit-card="cc => credit_card = cc"
+                                                  @continue="currentStep++"
+                    >
+                      <template #default="{ submit }">
+                        <checkin-step-nav
+                            :current-step="steps[i]"
+                            :prev-step="prevStep"
+                            :next-step="nextStep"
+                            :submit="submit"
+                            :loading="false"
+                            @back="currentStep--"
+                        />
+                      </template>
+                    </reservation-checkin-payments>
 
-                <!-- Contract -->
-                <template v-if="step.id === 'contract'">
-                  <v-stepper-step
-                      :key="`step-${step.id}`"
-                      :step="(i+1)"
-                      :editable="currentStep >= (i+1)"
-                      edit-icon="mdi-credit-card"
-                  >
-                    Contract
-                  </v-stepper-step>
-                  <v-stepper-content
-                      :key="`step-content-${step.id}`"
-                      :step="(i+1)"
-                      class="px-1 mr-1"
-                  >
-                    <reservation-contract-signature
-                        v-if="steps.filter(s => s.id !== 'contract').every(s => s.completed)"
-                        v-on="$listeners"
-                        :property="property"
-                        :reservation="reservation"
-                    />
-                    <div v-else class="py-5 text-center grey--text">
-                      Complete all the steps first
-                    </div>
-                  </v-stepper-content>
-                </template>
-
+                    <!-- Contract -->
+                    <reservation-contract-signature v-if="step.id === 'contract'"
+                          v-on="$listeners"
+                          :property="property"
+                          :reservation="reservation"
+                      >
+                        <template #default="{ submit }">
+                          <checkin-step-nav
+                              :current-step="steps[i]"
+                              :prev-step="prevStep"
+                              :next-step="{ name: 'Sign contract' }"
+                              :submit="submit"
+                              :loading="false"
+                              @back="currentStep--"
+                          />
+                        </template>
+                      </reservation-contract-signature>
+                  </div>
+                </v-stepper-content>
               </template>
-            </responsive-stepper>
-          </template>
+
+            </template>
+          </responsive-stepper>
+        </template>
         <template v-else>
           <v-alert type="info">
-            Kindly complete authentication
+            Kindly complete authentication first
           </v-alert>
         </template>
-        </data-container>
     </section>
 </template>
 
@@ -229,13 +196,13 @@ import ResponsiveStepper from "@/components/ResponsiveStepper";
 import reservation from "@/domain/Reservation/Mixins/reservation";
 import session from "@/domain/Reservation/Mixins/session";
 import ReservationCheckinPayments from "@/domain/Reservation/Widgets/Checkin/ReservationPayments.vue";
-import DataContainer from "@/components/DataContainer.vue";
+import CheckinStepNav from "@/domain/Reservation/Widgets/Checkin/CheckinStepNav.vue";
 
 export default {
     name: "ReservationCheckin",
     mixins: [reservation, session],
     components: {
-      DataContainer,
+      CheckinStepNav,
       ReservationCheckinPayments,
       ResponsiveStepper,
        ReservationIdVerification,
@@ -281,18 +248,21 @@ export default {
             if(this.reservation.require_id_verification) {
                 steps.push({
                     id: 'id-verification',
+                    name: 'ID Verification',
                     completed: this.verificationSubmitted
                 })
             }
 
             steps.push({
                 id: 'guest',
+                name: 'Guest Info',
                 completed: this.guestsAvailable
             })
             
             if(this.reservation.questions && this.reservation.questions.length) {
                 steps.push({
                     id: 'questions',
+                    name: 'Questions',
                     completed: this.questionsRespondedTo
                 })
             }
@@ -300,6 +270,7 @@ export default {
             if((this.reservation.agreements && this.reservation.questions.length) || this.additionalAgreements.length) {
                 steps.push({
                     id: 'agreements',
+                    name: 'Agreements',
                     completed: this.agreementsAgreed
                 })
             }
@@ -307,6 +278,7 @@ export default {
           if(this.reservation.require_credit_card) {
             steps.push({
               id: 'credit-card',
+              name: 'Credit card',
               completed: this.creditCardCollected
             })
           }
@@ -314,15 +286,28 @@ export default {
           if((this.reservation.charges && this.reservation.charges.length) || this.reservation.balance) {
               steps.push({
                   id: 'payment',
+                  name: 'Charges payment',
                   completed: this.allPaymentMade
               })
           }
 
-            steps.push({
-                id: 'contract'
-            })
+          steps.push({
+              id: 'contract',
+              name: 'Contract',
+              completed: steps.filter(s => s.id !== 'contract').every(s => s.completed)
+          })
 
-            return steps;
+          return steps;
+        },
+
+        prevStep() {
+            if(this.currentStep <= 1 ) return null;
+            return this.steps[this.currentStep - 2];
+        },
+
+        nextStep() {
+          if(this.currentStep >= this.steps.length ) return null;
+          return this.steps[this.currentStep];
         },
 
         allPaymentMade(){
@@ -441,39 +426,31 @@ export default {
         stepChanged(step) {
             this.currentStep = step;
         },
-
-        setCheckinSession() {
-          this.loading = true;
-          this.setSession().then(() => {
-            this.loading = false
-          }).catch(e => {
-            console.log("Error while setting session-->", e)
-          })
-        }
-
     },
 
-  mounted() {
-    this.setCheckinSession()
-  },
-
   watch: {
-        reservation: {
-            immediate: true,
-            handler(){
-              this.SET_AUTH_REQUIRED(!this.canStart)
-            }
-        },
-        currentStep: {
-            immediate: false,
-            handler(index) {
-              const step = this.steps[index - 1]
-              this.createSessionActivity({
-                title: "Checkin Progress",
-                description: `Checkin step now at ${step.id}`
-              })
-            }
+      reservation: {
+          immediate: true,
+          handler(){
+            this.SET_AUTH_REQUIRED(!this.canStart)
+          }
+      },
+      canStart: {
+        immediate: true,
+        handler(start) {
+          if(start) this.setSession()
         }
+      },
+      currentStep: {
+          immediate: false,
+          handler(index) {
+            const step = this.steps[index - 1]
+            this.createSessionActivity({
+              title: "Checkin Progress",
+              description: `Checkin step now at ${step.id}`
+            })
+          }
+      }
     }
 
 }

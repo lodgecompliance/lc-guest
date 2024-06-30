@@ -4,7 +4,7 @@
       :error="error"
       @retry="getIdentity"
   >
-      <v-card v-if="verification" outlined>
+      <v-card v-if="verification" flat>
         <files-preview
             :value="[verification.id_image]"
             :grid="1" :allow-remove="false"

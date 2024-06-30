@@ -1,5 +1,5 @@
 <template>
-    <v-card>
+    <v-card flat>
       <v-card-text>
         <p>Questions required by the host to be answered for your checkin</p>
         <div v-if="questions.length">
@@ -43,11 +43,11 @@
           No question for the reservation
         </div>
       </v-card-text>
-      <v-card-actions>
-        <slot v-bind="{ questions: responses, submitting, submit }">
+      <slot v-bind="{ questions: responses, submitting, submit }">
+        <v-card-actions>
           <v-btn color="primary" :loading="submitting" @click="submit" depressed>Continue</v-btn>
-        </slot>
-      </v-card-actions>
+        </v-card-actions>
+      </slot>
     </v-card>
 </template>
 
@@ -112,8 +112,9 @@ export default {
     },
 
     watch: {
-      reservation: {
+      checkin_session: {
         immediate: true,
+        deep: true,
         handler(r) {
           const answered = this.getCheckinData('questions') || []
           this.responses = this.questions.map(q => {

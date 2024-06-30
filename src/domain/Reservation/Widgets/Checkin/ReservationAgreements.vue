@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card flat>
     <v-card-text class="pa-0">
       <p>You need to agree to the following. Checking the boxes means you agree to each item</p>
       <v-list dense v-if="agreements.length">
@@ -68,7 +68,8 @@ export default {
     }
   },
   watch: {
-    reservation: {
+    checkin_session: {
+      deep: true,
       immediate: true,
       handler() {
         const agreeds = [];

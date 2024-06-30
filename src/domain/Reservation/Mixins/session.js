@@ -148,7 +148,6 @@ export default {
                         }
                     }`,
                     variables: {
-                        session_id: this.sessionId,
                         reservation_id: this.checkin_session.reservation.id,
                         user_id: this.current_user.auth?.uid,
                     }

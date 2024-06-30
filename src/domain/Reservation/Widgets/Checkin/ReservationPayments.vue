@@ -1,5 +1,5 @@
 <template>
-    <v-card>
+    <v-card flat>
       <v-card-text>
         <reservation-charges
             :reservation="reservation"
@@ -34,11 +34,11 @@
           </template>
         </reservation-charges>
       </v-card-text>
-      <v-card-actions>
-        <slot v-bind="{ credit_card, charges }">
+      <slot v-bind="{ credit_card, charges, submit }">
+        <v-card-actions>
           <v-btn color="primary" @click="$emit('continue')" depressed>Continue</v-btn>
-        </slot>
-      </v-card-actions>
+        </v-card-actions>
+      </slot>
     </v-card>
 </template>
 
@@ -77,6 +77,10 @@ export default {
         this.credit_card = card;
         this.$emit('credit-card', card)
       },
+
+      submit() {
+        this.$emit('continue')
+      }
     },
 }
 </script>

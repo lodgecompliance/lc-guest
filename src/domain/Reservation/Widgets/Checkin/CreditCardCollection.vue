@@ -1,5 +1,5 @@
 <template>
-    <v-card>
+    <v-card flat>
       <v-card-text>
         <template v-if="gateway">
           <stripe-credit-card-select
@@ -36,11 +36,11 @@
           No payment gateway available
         </v-alert>
       </v-card-text>
-      <v-card-actions>
         <slot v-bind="{ creditCard, submitting, submit }">
-          <v-btn color="primary" :loading="submitting" @click="submit" depressed>Continue</v-btn>
+          <v-card-actions>
+            <v-btn color="primary" :loading="submitting" @click="submit" depressed>Continue</v-btn>
+          </v-card-actions>
         </slot>
-      </v-card-actions>
     </v-card>
 </template>
 

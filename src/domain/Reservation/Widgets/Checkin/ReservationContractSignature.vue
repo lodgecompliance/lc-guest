@@ -9,12 +9,11 @@
             >
                 You can proceed to sign checkin contract
             </v-alert>
-            <v-btn
-            color="primary"
-            @click="$refs.contract.open()" 
-            :disabled="!canSign" depressed
-            >Sign contract</v-btn>
         </template>
+
+        <slot v-bind="{ canSign, submit }">
+          <v-btn color="primary" @click="submit" :disabled="!canSign" depressed>Sign contract</v-btn>
+        </slot>
        
         <reservation-checkin-contract
             ref="contract"
@@ -56,5 +55,10 @@ export default {
           return this.reservation ? this.reservation.setting : null;
       },
     },
+  methods: {
+      submit() {
+        this.$refs.contract.open()
+      }
+  }
 }
 </script>

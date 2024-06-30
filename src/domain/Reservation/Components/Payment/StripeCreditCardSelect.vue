@@ -13,8 +13,8 @@
                   :key="c"
                   class="my-1"
                   :card="card"
-                  :dark="card.id === creditCard.id"
-                  :color="`${card.id === creditCard.id ? 'primary' : ''}`"
+                  :dark="creditCard && card.id === creditCard.id"
+                  :color="`${creditCard && card.id === creditCard.id ? 'primary' : ''}`"
                   @click="creditCard = card"
               >
                 <template #actions="attr">
@@ -61,8 +61,8 @@
                   v-for="(method, m) in paymentMethods"
                   :key="m"
                   class="my-1"
-                  :dark="method.id === paymentMethod.id"
-                  :color="`${method.id === paymentMethod.id ? 'primary' : ''}`"
+                  :dark="paymentMethod && method.id === paymentMethod.id"
+                  :color="`${paymentMethod && method.id === paymentMethod.id ? 'primary' : ''}`"
                   :method="method"
                   @click="paymentMethod = method"
               >
@@ -708,7 +708,25 @@ export default {
                     this.creditCard = null;
                 }
             }
+        },
+
+      cards: {
+          immediate: true,
+          handler(cards) {
+            if(this.creditCard && !(cards || []).map(c => c.id).includes(this.creditCard.id)) {
+              this.creditCard = null;
+            }
+          }
+      },
+
+      paymentMethods: {
+        immediate: true,
+        handler(methods) {
+          if(this.paymentMethod && !(methods || []).map(m => m.id).includes(this.paymentMethod.id)) {
+            this.paymentMethod = null;
+          }
         }
+      }
     }
 
 }
