@@ -5,13 +5,15 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 import store from './store'
 import config from "@/config";
 
-export default async (uri, onNetworkError = () => {}, onGraphQlError = () => {}) => {
+export default async (uri, authRequired = true, onNetworkError = () => {}, onGraphQlError = () => {}) => {
     const headers = {
         'LC-CLIENT-TOKEN': `Bearer ${config.apollo.client_key}`
     }
-    const authToken = await store.dispatch('getAuthToken');
-    if(authToken) {
-        headers['LC-USER-TOKEN'] = `Bearer ${authToken}`
+    if(authRequired) {
+        const authToken = await store.dispatch('getAuthToken');
+        if(authToken) {
+            headers['LC-USER-TOKEN'] = `Bearer ${authToken}`
+        }
     }
     const httpLink = new HttpLink({ uri, fetch, headers });
 

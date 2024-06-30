@@ -64,44 +64,54 @@ const actions = {
 
 
     refreshAuthToken({ commit, dispatch, getters }) {
-        return dispatch('query', {
+        return dispatch('mutate', {
             domain: config.apollo.auth,
+            authRequired: false,
             mutation: REFRESH_AUTH_USER_TOKEN,
             variables: {
                 origin: config.app.url,
                 refresh_token: getters.auth.token?.refresh_token
             }
         }).then(response => {
+            const refresh = response?.data?.refreshAuthToken;
+            const newToken = getters.auth.token;
+            newToken.token = refresh?.access_token
+            newToken.expires_at = moment()
+                .add(refresh?.expires_in, 'seconds')
+                .toISOString()
             commit('SET_AUTH', {
-                token: response?.data?.refreshAuthToken,
+                token: newToken,
                 profile: getters.auth.profile
             })
+            return newToken.token
         })
     },
 
-    getAuthToken( { dispatch, getters } ) {
-        if (!getters.auth?.token) return Promise.resolve(null)
-        if(moment(getters.auth.token.expirationTime).isSameOrBefore(moment())) {
+    getAuthToken( { commit, dispatch, getters } ) {
+        if (!getters.auth?.token) return Promise.resolve(null);
+        const expirationMoment = moment(getters.auth.token.expires_at);
+        const minutesDiff = expirationMoment.diff(moment(), 'minutes');
+        if(minutesDiff <= 5) {
             return dispatch('refreshAuthToken')
-                .then(() => dispatch('getAuthToken'))
+                .then((token) => token)
                 .catch(() => dispatch('signout'))
         } else {
             return Promise.resolve(getters.auth.token?.token)
         }
     },
 
-    query({commit, dispatch}, { domain = config.apollo.gr,  query, variables, trial = 1 }){
-        return _apollo(domain,(e) => {
+    query({commit, dispatch}, { domain = config.apollo.gr, authRequired = true, query, variables, trial = 1 }){
+        return _apollo(domain, authRequired,(e) => {
                 console.log('Network Error-->', e);
             }, (e) => {
                 console.log('GraphQL Error-->', e);
             }
         )
-            .then(apollo =>  apollo.client.query({ query, variables }))
+        .then(apollo =>  apollo.client.query({ query, variables }))
     },
 
-    mutate({commit, dispatch}, { domain = config.apollo.gr, mutation, variables}){
-        return _apollo(domain,(e) => {
+    mutate({commit, dispatch}, { domain = config.apollo.gr, authRequired = true, mutation, variables}){
+        return _apollo(domain, authRequired,(e) => {
                 console.log('Network Error-->', e);
             }, (e) => {
                 console.log('GraphQL Error-->', e);

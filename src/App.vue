@@ -102,6 +102,7 @@ import ErrorHandler from "@/components/ErrorHandler.vue";
 import AppMenu from "@/components/AppMenu.vue";
 import HeaderNotifications from "@/components/HeaderNotifications.vue";
 import session from "@/domain/Reservation/Mixins/session";
+import moment from "moment";
 
 export default {
   name: 'App',
@@ -241,7 +242,8 @@ export default {
             switch (type) {
               case "auth":
                 if(status === 'signedin') {
-                  vm.SET_AUTH({ token, profile })
+                  token.expires_at = moment(token.expirationTime).local().toISOString();
+                  vm.SET_AUTH({ token, profile });
                   vm.SET_AUTH_REQUIRED(!(token && profile));
                   vm.setUser()
                 }
