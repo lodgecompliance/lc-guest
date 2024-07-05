@@ -25,7 +25,7 @@
       :reservation="reservation"
       :charge="charge"
       :payload="payload"
-      :total="charge.amount/100"
+      :total="charge.amount"
       :currency="charge.currency"
       @transactions="paystackPayments"
       @credit-card="card => $emit('paystack-credit-card', card)"

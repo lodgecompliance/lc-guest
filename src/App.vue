@@ -28,7 +28,7 @@
         <h4>{{ current_page.title || appName }}</h4>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <header-notifications v-if="authenticated" class="mr-2" />
+      <header-notifications class="mr-2" />
       <app-menu @signout="signUserOut" />
     </v-app-bar>
 
@@ -82,7 +82,7 @@
       <v-btn x-small @click="updateApp" title="Reload app" icon><v-icon>mdi-refresh</v-icon></v-btn>
     </v-footer>
     <div v-if="auth_required" :class="`auth-frame-container authenticate`">
-      <iframe id="authFrame" :src="authUrl"></iframe>
+      <iframe id="authFrame" :src="authUrl" allow="camera"></iframe>
     </div>
   </v-app>
 </template>
@@ -137,7 +137,10 @@ export default {
     ]),
 
     authUrl() {
-      return `${this.authDomain}/auth?${querystring.stringify(this.auth_params)}`;
+      return `${this.authDomain}/auth?${querystring.stringify({
+        ...this.auth_params,
+        referer: window.location.href
+      })}`;
     }
   },
 

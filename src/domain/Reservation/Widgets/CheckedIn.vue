@@ -30,7 +30,7 @@
                 <h4>ID Verification</h4>
               </v-expansion-panel-header>
               <v-expansion-panel-content class="pt-3">
-                <user-identity-verification :user-id="reservation.user_id" />
+                <user-identity-verification :user-id="reservation.user_id" flat />
               </v-expansion-panel-content>
             </v-expansion-panel>
 

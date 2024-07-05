@@ -4,8 +4,10 @@
         v-if="prevStep"
         color="primary"
         @click="$emit('back')"
+        :icon="$vuetify.breakpoint.mobile"
         depressed>
-      Back to {{ prevStep.name }}
+      <v-icon>mdi-chevron-left</v-icon>
+      <span v-if="!$vuetify.breakpoint.mobile">Go Back</span>
     </v-btn>
     <v-spacer></v-spacer>
     <v-btn
@@ -15,7 +17,8 @@
         :disabled="!(currentStep && currentStep.completed)"
         :loading="loading"
         depressed>
-      Continue to {{ nextStep.name }}
+      Continue
+      <v-icon>mdi-chevron-right</v-icon>
     </v-btn>
   </v-card-actions>
 </template>

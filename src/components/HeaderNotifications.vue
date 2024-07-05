@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import {mapActions} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 import config from "@/config";
 import gql from "graphql-tag";
 
@@ -28,6 +28,8 @@ export default {
     }
   },
   computed: {
+
+    ...mapGetters(['authenticated']),
 
     notificationsLink() {
       return `${config.app.authDomain}/notifications`
@@ -65,6 +67,15 @@ export default {
   mounted() {
     this.getNotifications();
   }
+
+  // watch: {
+  //   authenticated: {
+  //     immediate: true,
+  //     handler(auth) {
+  //       if(auth) this.getNotifications()
+  //     }
+  //   }
+  // }
 }
 </script>
 

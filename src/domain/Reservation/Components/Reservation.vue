@@ -1,5 +1,5 @@
 <template>
-    <v-card flat>
+    <v-card :to="{ name: 'reservation.show', params: { reservation: reservation.id } }" flat>
         <v-img
             :src="reservation.property.cover_image"
             class="white--text align-end"
@@ -12,11 +12,6 @@
               <span class="ml-2">{{ reservation.property.name }}</span>
             </div>
             <v-spacer></v-spacer>
-            <reservation-guest-options
-                :reservation="reservation"
-                :activator="{ color: 'white' }"
-                v-on="$listeners"
-            />
           </v-card-title>
         </v-img>
         <v-card-subtitle>
@@ -35,10 +30,9 @@
 <script>
     import ReservationStatus from "@/domain/Reservation/Components/ReservationStatus";
     import reservation from "@/domain/Reservation/Mixins/reservation";
-    import ReservationGuestOptions from "@/domain/Reservation/Components/ReservationGuestOptions";
     import ProfileAvatar from "@/components/ProfileAvatar.vue";
     export default {
-      components: {ProfileAvatar, ReservationGuestOptions, ReservationStatus},
+      components: {ProfileAvatar, ReservationStatus},
       mixins: [reservation],
       data(){
             return {

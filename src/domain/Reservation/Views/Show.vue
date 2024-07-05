@@ -264,7 +264,6 @@ export default {
         if(!r) return;
         this.SET_AUTH_PARAM({ key:  'idVerification', value: r.require_id_verification ? 1 : 0 })
         this.SET_AUTH_PARAM({ key:  'reservationId', value: r.id })
-        this.SET_AUTH_PARAM({ key: 'referer', value: this.url(this.startPath) })
       }
     }
   }

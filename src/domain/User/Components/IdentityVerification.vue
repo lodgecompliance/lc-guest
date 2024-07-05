@@ -1,40 +1,54 @@
 <template>
-  <data-container
-      :loading="loading"
-      :error="error"
-      @retry="getIdentity"
-  >
-    <v-card v-if="verification" outlined>
-      <files-preview
-          :value="[verification.id_image]"
-          :grid="1" :allow-remove="false"
-          :item-height="150"
-      />
-      <v-card-title>
-        {{ [verification.first_name, verification.last_name].join(" ") }}
-      </v-card-title>
-      <v-card-subtitle class="grey--text">
-        {{ verification.id_type }}: {{ verification.id_number }}
-      </v-card-subtitle>
+    <v-card v-bind="$attrs" :loading="loading">
+      <data-container
+          :loading="loading"
+          :error="error"
+          @retry="getIdentity"
+      >
+        <v-card-text v-if="verification">
+          <v-alert v-if="verification[provider] && verification[provider].verified"
+                   type="success"
+                   border="left"
+                   colored-border
+          >
+            ID is verified
+          </v-alert>
+          <v-alert v-else-if="verification.manually_completed"
+                   type="info"
+                   border="left"
+                   colored-border
+          >
+            ID was manually uploaded
+          </v-alert>
+          <v-alert v-else
+                   type="warning"
+                   border="left"
+                   colored-border
+          >
+            ID not verified
+          </v-alert>
+          <v-btn :href="idUrl" target="_blank" color="primary" text depressed>
+            View ID
+            <v-icon class="ml-3" small>mdi-open-in-new</v-icon>
+          </v-btn>
+        </v-card-text>
+        <v-card-text v-else class="text-center grey--text py-5">
+          ID verification not available
+        </v-card-text>
+      </data-container>
+      <slot v-bind="{ loading, verification }" />
     </v-card>
-    <v-card v-else outlined>
-      <v-card-text class="text-center grey--text py-5">
-        ID verification not available
-      </v-card-text>
-    </v-card>
-  </data-container>
 </template>
 
 <script>
 import gql from "graphql-tag";
-import { mapActions } from "vuex";
+import {mapActions, mapGetters} from "vuex";
 import config from "@/config";
 import DataContainer from "@/components/DataContainer.vue";
-import FilesPreview from "@/components/FilesPreview.vue";
 
 export default {
   name: "UserIdentityVerification",
-  components: {FilesPreview, DataContainer },
+  components: { DataContainer },
   data(){
     return {
       loading: false,
@@ -45,7 +59,28 @@ export default {
   props: {
     userId: String
   },
-  computed: {},
+  computed: {
+    ...mapGetters(['current_user']),
+
+    idUrl() {
+      if(this.userId === this.current_user.auth.uid) {
+        return `${config.app.authDomain}/id-verification`
+      }
+      return `${config.app.authDomain}/shared-profile/${btoa(JSON.stringify(this.sharedProfileToken))}`
+    },
+
+    provider() {
+      return this.verification?.provider
+    },
+
+    sharedProfileToken() {
+      return {
+        id: this.userId,
+        shareWith: this.current_user.auth.uid,
+        section: "id-verification"
+      }
+    }
+  },
   methods: {
     ...mapActions(['query']),
     getIdentity() {
@@ -57,41 +92,13 @@ export default {
         query getUserById($id: ID!) {
           getUserById(id: $id) {
             id_verification {
-              user_id
-              first_name
-              last_name
-              country
-              id_type
-              id_number
-              id_image
-              timestamp {
-                  created_at
-                  updated_at
-              }
+              provider
+              manually_completed
               stripe {
-                  id
-                  status
-                  type
-                  url
-                  client_secret
+                  verified
               }
               smile {
-                ResultCode
-                ResultText
-                Actions {
-                    Liveness_Check
-                    Register_Selfie
-                    Selfie_Provided
-                    Verify_ID_Number
-                    Human_Review_Compare
-                    Return_Personal_Info
-                    Selfie_To_ID_Card_Compare
-                    Human_Review_Update_Selfie
-                    Human_Review_Liveness_Check
-                    Selfie_To_ID_Authority_Compare
-                    Update_Registered_Selfie_On_File
-                    Selfie_To_Registered_Selfie_Compare
-                }
+                verified
               }
             }
           }
@@ -100,7 +107,8 @@ export default {
         variables: { id: this.userId }
       })
       .then(response => {
-        this.verification = response.data.getUserById?.id_verification
+        this.verification = response.data.getUserById?.id_verification;
+        this.$emit('verification', this.verification)
       })
       .catch(e => this.error = e)
       .finally(() => this.loading = false)

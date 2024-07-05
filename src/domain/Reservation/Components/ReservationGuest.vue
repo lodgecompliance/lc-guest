@@ -93,7 +93,7 @@
              v-on="$listeners"
               />
             <template v-if="isCheckedIn" >
-              <user-identity-verification :user-id="guest.user_id" />
+              <user-identity-verification :user-id="guest.user_id" flat />
             </template>
 
         </v-card-text>
