@@ -3,7 +3,7 @@ import moment from "moment";
 export default {
     install(Vue) {
         Vue.filter('nullable', (value, defaultValue = '--') => {
-            return value && value != '' ? value : defaultValue;
+            return value && value !== '' ? value : defaultValue;
         })
 
         Vue.filter('money_value', (amount, currency = '') => {
@@ -68,7 +68,7 @@ export default {
             const date = `${specific.day}/${specific.month}/${specific.year}`;
             const time = `${specific.hour}:${specific.minute}:${specific.second}`;
 
-            if(!format || format == '') return `${date} ${time}`
+            if(!format || format === '') return `${date} ${time}`
 
              return format.replace(/second|minute|hour|day|month|mName|year|diff/gi, (matched) => specific[matched]);
         });
