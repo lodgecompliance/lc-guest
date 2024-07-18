@@ -1,7 +1,7 @@
 {
   "projects": {
     "dev": "guestregistration-4140a",
-    "prod": "guest-registration-prod"
+    "prod": "lodge-compliance-59f61"
   },
   "targets": {
     "guestregistration-4140a": {
@@ -11,7 +11,7 @@
         ]
       }
     },
-    "guest-registration-prod": {
+    "lodge-compliance-59f611": {
       "hosting": {
         "lc": [
           "lc-checkin-prod"
