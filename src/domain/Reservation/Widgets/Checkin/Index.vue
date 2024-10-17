@@ -267,7 +267,7 @@ export default {
                 })
             }
 
-            if((this.reservation.agreements && this.reservation.questions.length) || this.additionalAgreements.length) {
+            if((this.reservation.agreements && this.reservation.agreements.length) || this.additionalAgreements.length) {
                 steps.push({
                     id: 'agreements',
                     name: 'Agreements',

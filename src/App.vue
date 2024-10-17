@@ -265,7 +265,7 @@ export default {
       $route: {
         immediate: true,
         handler(route) {
-          this.SET_CURRENT_PAGE({ title: route.meta.title });
+          this.SET_CURRENT_PAGE({ title: route.meta.title, isProtected: route.meta.requiresAuth });
           this.SET_MODE(
               route.query?.source === "sdk"
               ? 'sdk' : 'application'

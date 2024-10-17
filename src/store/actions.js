@@ -87,8 +87,11 @@ const actions = {
         })
     },
 
-    getAuthToken( { commit, dispatch, getters } ) {
-        if (!getters.auth?.token) return Promise.resolve(null);
+    getAuthToken( { commit, dispatch, getters }) {
+        if (!getters.auth?.token) {
+            commit('SET_AUTH_REQUIRED', getters.current_page?.isProtected)
+            return Promise.resolve(null)
+        }
         const expirationMoment = moment(getters.auth.token.expires_at);
         const minutesDiff = expirationMoment.diff(moment(), 'minutes');
         if(minutesDiff <= 5) {
