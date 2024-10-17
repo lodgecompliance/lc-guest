@@ -10,7 +10,7 @@
                     <v-radio
                         v-for="(option, o) in question.options" :key="o"
                         :label="option.option"
-                        :value="option"
+                        :value="option.option"
                     ></v-radio>
                 </v-radio-group>
             </template>
@@ -75,17 +75,19 @@ export default {
         }
     },
 
-    props: {
-       question: Object,
-       priorResponse: Object
-    },
+  props: {
+     question: Object,
+     priorResponse: Object
+  },
 
     methods: {
         responseInput(response) {
             if(!response) return;
             this.$emit('response', {
                 ...this.question,
-                response
+                response: this.question.response_type === 'options'
+                    ? this.question.options.find(o => o.option === response)
+                    : response
             })
         },
 

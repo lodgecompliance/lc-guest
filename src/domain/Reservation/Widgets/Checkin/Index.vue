@@ -283,7 +283,11 @@ export default {
             })
           }
 
-          if((this.reservation.charges && this.reservation.charges.length) || this.reservation.balance) {
+          if(
+              (this.reservation.charges && this.reservation.charges.length)
+              || this.reservation.balance
+              || this.attachedCharges.length
+          ) {
               steps.push({
                   id: 'payment',
                   name: 'Charges payment',

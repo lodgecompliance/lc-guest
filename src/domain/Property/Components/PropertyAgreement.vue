@@ -30,7 +30,7 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-btn text color="red" @click="dialog = false">close</v-btn>
-                    <v-btn v-if="agreement.link" color="primary" @click="openLink()">Open link <v-icon>mdi-open-in-new</v-icon></v-btn>
+                    <v-btn v-if="agreement.link" color="primary" @click="openLink()" small depressed>Open link <v-icon small>mdi-open-in-new</v-icon></v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
