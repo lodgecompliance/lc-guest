@@ -45,6 +45,7 @@ import gql from "graphql-tag";
 import {mapActions, mapGetters} from "vuex";
 import config from "@/config";
 import DataContainer from "@/components/DataContainer.vue";
+import LC from "@/lc";
 
 export default {
   name: "UserIdentityVerification",
@@ -64,9 +65,9 @@ export default {
 
     idUrl() {
       if(this.userId === this.current_user.auth.uid) {
-        return `${config.app.authDomain}/id-verification`
+        return LC.link('id-verification')
       }
-      return `${config.app.authDomain}/shared-profile/${btoa(JSON.stringify(this.sharedProfileToken))}`
+      return LC.link(`shared-profile/${btoa(JSON.stringify(this.sharedProfileToken))}`)
     },
 
     provider() {

@@ -22,7 +22,7 @@
           <v-list-item-title>Recent Checkins</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
-      <v-list-item :href="authDomain" target="_blank">
+      <v-list-item :href="accountLink" target="_blank">
         <v-list-item-icon>
           <v-icon>mdi-account</v-icon>
         </v-list-item-icon>
@@ -49,6 +49,7 @@
 import ProfileAvatar from "@/components/ProfileAvatar";
 import {mapGetters} from "vuex";
 import config from "@/config";
+import Lc from "@/lc";
 
 export default {
   name: "AppMenu",
@@ -59,7 +60,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['current_user'])
+    ...mapGetters(['current_user']),
+    accountLink() {
+      return Lc.link(``)
+    }
   }
 }
 </script>

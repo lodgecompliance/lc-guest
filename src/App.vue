@@ -81,9 +81,6 @@
       <v-spacer></v-spacer>
       <v-btn x-small @click="updateApp" title="Reload app" icon><v-icon>mdi-refresh</v-icon></v-btn>
     </v-footer>
-    <div v-if="auth_required" :class="`auth-frame-container authenticate`">
-      <iframe id="authFrame" :src="authUrl" allow="camera"></iframe>
-    </div>
   </v-app>
 </template>
 
@@ -101,6 +98,7 @@ import HeaderNotifications from "@/components/HeaderNotifications.vue";
 import session from "@/domain/Reservation/Mixins/session";
 import moment from "moment";
 import querystring from "querystring";
+import Lc from "@/lc";
 
 export default {
   name: 'App',
@@ -135,13 +133,6 @@ export default {
       'auth_params',
       'checkin_session',
     ]),
-
-    authUrl() {
-      return `${this.authDomain}/auth?${querystring.stringify({
-        ...this.auth_params,
-        referer: window.location.href
-      })}`;
-    }
   },
 
     methods:{
@@ -150,7 +141,6 @@ export default {
           'syncAuthUser',
           'getSystemParams',
           'signout',
-          'signedOut',
           'query',
           'mutate'
       ]),
@@ -203,7 +193,7 @@ export default {
         this.signout()
         .then(() => {
           this.$intercom?.shutdown();
-          this.signedOut();
+          Lc.signout();
         }).finally(() => {
           this.SET_APP_STATE(true);
         })
@@ -225,7 +215,8 @@ export default {
           return Promise.reject(
               "Cannot start application, critical update is required. Hold on while application is rebooted"
           )
-        }
+        } else if(this.$route.meta.requiresAuth) this.setUser()
+        else this.SET_APP_STATE(true)
       })
       .catch(e => {
         console.log(e);
@@ -233,47 +224,22 @@ export default {
     },
 
     created() {
-      const vm = this;
         this.SET_MOBILE( screen.width < 768);
         window.addEventListener('resize', (e) => {
           this.SET_MOBILE( screen.width < 768)
         })
-        window.addEventListener('message', function(message) {
-          if (message.origin === config.app.authDomain) {
-            let { type, token, profile, status } = message.data;
-            switch (type) {
-              case "auth":
-                if(status === 'signedin') {
-                  token.expires_at = moment(token.expirationTime).local().toISOString();
-                  vm.SET_AUTH({ token, profile });
-                  vm.SET_AUTH_REQUIRED(!(token && profile));
-                  vm.setUser()
-                }
-                else if(status === 'signedout') {
-                  vm.signedOut();
-                }
-                break;
-              case "view-account":
-                window.location.replace(config.app.authDomain);
-                break;
-            }
-          }
-        });
     },
 
     watch: {
       $route: {
         immediate: true,
         handler(route) {
-          this.SET_CURRENT_PAGE({ title: route.meta.title, isProtected: route.meta.requiresAuth });
+          this.SET_CURRENT_PAGE({ title: route.meta.title });
           this.SET_MODE(
               route.query?.source === "sdk"
               ? 'sdk' : 'application'
           )
           this.SET_APP_LAYOUT(this.mode === 'sdk' ? 'plain' : route.meta.layout || 'full');
-          const authRequired = route.meta.requiresAuth && !this.authenticated;
-          if(authRequired) this.SET_AUTH_REQUIRED(true)
-          else this.SET_APP_STATE(true);
         }
       }
     }
@@ -310,46 +276,6 @@ export default {
   .box-shadow-unset {
     box-shadow: unset !important;
     -webkit-box-shadow: unset !important;
-  }
-
-  .auth-frame-container {
-    display: none
-  }
-
-  .auth-frame-container iframe {
-    border: 0;
-  }
-
-  .auth-frame-container.authenticate {
-    padding: 50px 0;
-    display: flex;
-    position: fixed;
-    height: 100vh;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(0,0,0,.5);
-    justify-content: center;
-    align-items: center;
-    border-radius: 5px;
-    z-index:1000000;
-  }
-
-  .auth-frame-container.authenticate iframe {
-    width: 90%;
-    height: 90%;
-  }
-
-  @media screen and (min-width: 768px) {
-    .auth-frame-container.authenticate iframe {
-      width: 50%;
-    }
-  }
-
-  @media screen and (min-width: 992px) {
-    .auth-frame-container.authenticate iframe {
-      width: 30%;
-    }
   }
 
 </style>

@@ -3,7 +3,7 @@ const state = {
     app_ready: false,
     app_process: '',
     auth: {
-        token: null,
+        token: window.localStorage.getItem('authorization') ? JSON.parse(window.localStorage.getItem('authorization')) : null,
         profile: null,
     },
     mode: 'application',

@@ -2,11 +2,12 @@
     <data-container :loading="loading" :error="error" @retry="getReservationCheckin">
       <slot v-if="checkin" v-bind="{ checkin, getReservationCheckin }">
         <template>
-          <reservation-checkin-contract ref="contract"
-                                        :checkin="checkin"
-                                        :property="property"
-                                        :reservation="reservation"
-                                        :pdfable="true"
+          <reservation-checkin-contract
+              ref="contract"
+              :checkin="checkin"
+              :property="property"
+              :reservation="reservation"
+              :pdfable="true"
           />
           <div class="d-flex align-center mb-3">
             <h3 class="">Checkin Information</h3>
@@ -258,6 +259,7 @@
     import ReservationDocumentRequests from "@/domain/Reservation/Widgets/ReservationDocumentRequests.vue";
     import ReservationDocumentRequestSubmission
       from "@/domain/Reservation/Widgets/ReservationDocumentRequestSubmission.vue";
+    import {mapActions, mapGetters} from "vuex";
     export default {
         name: "ReservationCheckinDetails",
         components: {
@@ -268,16 +270,16 @@
           ReservationDamageDispute,
           ReservationDamagePayment,
           ReservationDamages,
-            DataContainer,
-            ReservationCharges,
-            StripeCreditCard,
-            ReservationPayments,
-            ReservationCheckinContract,
-            UserIdentityVerification,
-            ReservationGuests,
-            PropertyAgreement,
-            PaystackCreditCard,
-            StripePaymentMethod
+          DataContainer,
+          ReservationCharges,
+          StripeCreditCard,
+          ReservationPayments,
+          ReservationCheckinContract,
+          UserIdentityVerification,
+          ReservationGuests,
+          PropertyAgreement,
+          PaystackCreditCard,
+          StripePaymentMethod
          },
 
         data(){
@@ -296,6 +298,7 @@
         },
 
         computed: {
+          ...mapGetters(['current_user']),
           agreements() {
             return this.checkin?.agreements || []
           },
@@ -308,41 +311,43 @@
         },
 
         methods: {
-
-            getReservationCheckin(){
-                this.loading = true;
-                this.error = null;
-                this.$store.dispatch('query',{
-                    query: GET_RESERVATION_CHECKIN,
-                    variables: {
-                        id: this.reservation.id
-                    }
-                })
-                .then(response => {
-                    this.checkin = response.data.getReservation?.checkin;
-                    if(!this.checkin.user){
-                        this.$store.commit('SNACKBAR', {
-                            status: true,
-                            text: "The user account that checked in no longer exist",
-                            color: "error"
-                        })
-                    }
-                })
-                .catch(e => {
-                    this.error = e
-                })
-                .finally(() => {
-                    this.loading = false;
-                })
-            },
-
+          ...mapActions([
+            'syncAuthUser'
+          ]),
+          getReservationCheckin(){
+              this.loading = true;
+              this.error = null;
+              this.$store.dispatch('query',{
+                  query: GET_RESERVATION_CHECKIN,
+                  variables: {
+                      id: this.reservation.id
+                  }
+              })
+              .then(response => {
+                  this.checkin = response.data.getReservation?.checkin;
+                  if(!this.checkin.user){
+                      this.$store.commit('SNACKBAR', {
+                          status: true,
+                          text: "The user account that checked in no longer exist",
+                          color: "error"
+                      })
+                  }
+              })
+              .catch(e => {
+                  this.error = e
+              })
+              .finally(() => {
+                  this.loading = false;
+              })
+          },
         },
-        watch: {
+      watch: {
             reservation: {
                 immediate: true,
                 handler(reservation){
                     if(reservation){
-                        this.getReservationCheckin();
+                      (this.current_user.auth && this.current_user.profile ? Promise.resolve() : this.syncAuthUser())
+                          .then(() => this.getReservationCheckin())
                     }
                 }
             }
