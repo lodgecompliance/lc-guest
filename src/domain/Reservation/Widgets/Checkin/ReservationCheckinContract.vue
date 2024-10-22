@@ -104,9 +104,11 @@
                 <section v-if="reservation.require_id_verification" class="my-2">
                     <h4 class="headline">ID Verification</h4>
                     <user-identity-verification
+                        flat
                         :user-id="reservation.already_checkedin ? reservation.user_id : $store.getters.current_user.profile.id"
                     />
                 </section>
+
                 <section class="my-2">
                   <h4 class="headline">Signature</h4>
                   <signature-pad

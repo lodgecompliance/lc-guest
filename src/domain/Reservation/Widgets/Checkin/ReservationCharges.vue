@@ -14,7 +14,7 @@
                 <v-divider></v-divider>
             </div>
         </template>
-        <v-form ref="chargePaymentForm" v-if="charges && charges.length">
+        <v-form ref="chargePaymentForm" v-if="allCharges.length">
 
             <slot name="label" v-bind="  { allChargesPaid } "/>
 
@@ -96,6 +96,7 @@
                             </v-btn>
                           </template>
                         </reservation-paystack-single-payment>
+                        <small v-else class="red--text">No payment gateway to process payment, contact host</small>
                       </template>
                     </template>
                 </reservation-charge>

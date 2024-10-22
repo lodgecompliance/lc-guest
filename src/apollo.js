@@ -4,19 +4,22 @@ import { onError } from "apollo-link-error";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import store from './store'
 import config from "@/config";
+import LC from "@/lc"
 
 export default async (uri, authRequired = true, onNetworkError = () => {}, onGraphQlError = () => {}) => {
     const headers = {
         'LC-CLIENT-TOKEN': `Bearer ${config.apollo.client_key}`
     }
     if(authRequired) {
-        const authToken = await store.dispatch('getAuthToken');
+        let authToken = await store.dispatch('getAuthToken');
+        if(!authToken) {
+            authToken = await store.dispatch('authenticate')
+        }
         if(authToken) {
             headers['LC-USER-TOKEN'] = `Bearer ${authToken}`
         }
     }
     const httpLink = new HttpLink({ uri, fetch, headers });
-
     // Error Handling
     const errorLink = onError(({ graphQLErrors, networkError }) => {
         if (graphQLErrors)

@@ -7,18 +7,27 @@ import GET_SYSTEM_PARAMS from '../graphql/query/getSystemParam'
 import REFRESH_AUTH_USER_TOKEN from '../domain/User/Queries/refreshAuthUserToken';
 import config from "@/config";
 import moment from "moment";
+import LC from "@/lc"
 
 const actions = {
 
     getSystemParams({ commit, dispatch }) {
         return new Promise((resolve, reject) => {
             dispatch('query', {
-                query: GET_SYSTEM_PARAMS
+                query: GET_SYSTEM_PARAMS,
+                authRequired: false,
             }).then(response => {
                 const params = helper.convertMetaKeyValueToObj(response.data.getSystemParams || []);
                 commit("SET_SYSTEM_PARAMS", params)
                 resolve(params)
             }).catch(e => reject(e))
+        })
+    },
+
+    authenticate({ commit, getters }) {
+        return LC.authenticate(getters.auth_params).then(({ token, profile }) => {
+            commit('SET_AUTH', { token, profile })
+            return token.token
         })
     },
 
@@ -69,14 +78,13 @@ const actions = {
             authRequired: false,
             mutation: REFRESH_AUTH_USER_TOKEN,
             variables: {
-                origin: config.app.url,
                 refresh_token: getters.auth.token?.refresh_token
             }
         }).then(response => {
             const refresh = response?.data?.refreshAuthToken;
             const newToken = getters.auth.token;
             newToken.token = refresh?.access_token
-            newToken.expires_at = moment()
+            newToken.expirationTime = moment()
                 .add(refresh?.expires_in, 'seconds')
                 .toISOString()
             commit('SET_AUTH', {
@@ -87,16 +95,16 @@ const actions = {
         })
     },
 
-    getAuthToken( { commit, dispatch, getters } ) {
+    getAuthToken( { commit, dispatch, getters }) {
         if (!getters.auth?.token) return Promise.resolve(null);
-        const expirationMoment = moment(getters.auth.token.expires_at);
-        const minutesDiff = expirationMoment.diff(moment(), 'minutes');
-        if(minutesDiff <= 5) {
+        if(moment(getters.auth.token.expirationTime).isSameOrBefore(moment())) {
             return dispatch('refreshAuthToken')
                 .then((token) => token)
-                .catch(() => dispatch('signout'))
+                .catch((e) => {
+                    console.log(e)
+                })
         } else {
-            return Promise.resolve(getters.auth.token?.token)
+            return Promise.resolve(getters.auth.token.token)
         }
     },
 
@@ -125,15 +133,12 @@ const actions = {
             .then(() => dispatch('getAuthGrProfile'))
     },
 
-    signedOut(){
-        window.location.replace(`${config.app.authDomain}/signout?redirect=${window.location.href}`)
-    },
-
     signout({ commit }){
         return new Promise(resolve => {
             commit('UNSET_CURRENT_USER');
             commit('SET_AUTH', { token: null, profile: null });
             commit('SET_MODE', null);
+            window.localStorage.removeItem('authorization')
             resolve();
         })
     },

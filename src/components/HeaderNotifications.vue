@@ -18,6 +18,7 @@
 import {mapActions, mapGetters} from "vuex";
 import config from "@/config";
 import gql from "graphql-tag";
+import Lc from "@/lc";
 
 export default {
   name: "HeaderNotifications",
@@ -32,7 +33,7 @@ export default {
     ...mapGetters(['authenticated']),
 
     notificationsLink() {
-      return `${config.app.authDomain}/notifications`
+      return Lc.link('notifications')
     },
 
     unreadNotifications() {
@@ -64,18 +65,14 @@ export default {
     }
   },
 
-  mounted() {
-    this.getNotifications();
+  watch: {
+    authenticated: {
+      immediate: true,
+      handler(auth) {
+        if(auth) this.getNotifications()
+      }
+    }
   }
-
-  // watch: {
-  //   authenticated: {
-  //     immediate: true,
-  //     handler(auth) {
-  //       if(auth) this.getNotifications()
-  //     }
-  //   }
-  // }
 }
 </script>
 

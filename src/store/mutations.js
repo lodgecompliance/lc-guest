@@ -18,6 +18,7 @@ const mutations = {
 
     SET_AUTH: (state, auth) => {
         state.auth = auth
+        window.localStorage.setItem('authorization', JSON.stringify(state.auth.token))
     },
 
     SET_AUTH_PARAM: (state, { key, value }) => {

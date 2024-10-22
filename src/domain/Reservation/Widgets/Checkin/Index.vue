@@ -1,8 +1,7 @@
 <template>
-    <section>
-      <h4 class="my-2">Checkin</h4>
-      <p>Kindly complete your checkin process</p>
+    <data-container :loading="loading">
         <template v-if="canStart" >
+          <p class="py-5">Kindly complete your checkin process</p>
           <responsive-stepper flat non-linear @change="stepChanged" :step="currentStep" style="box-shadow: none">
             <template v-for="(step, i) in steps">
 
@@ -177,15 +176,15 @@
           </responsive-stepper>
         </template>
         <template v-else>
-          <v-alert type="info">
+          <v-alert type="info" colored-border>
             Kindly complete authentication first
           </v-alert>
         </template>
-    </section>
+    </data-container>
 </template>
 
 <script>
-import {mapActions, mapGetters, mapMutations} from 'vuex';
+import {mapActions, mapGetters} from 'vuex';
 import ReservationIdVerification from './ReservationIDVerification.vue';
 import ReservationAgreements from './ReservationAgreements';
 import ReservationQuestions from './ReservationQuestions';
@@ -197,11 +196,13 @@ import reservation from "@/domain/Reservation/Mixins/reservation";
 import session from "@/domain/Reservation/Mixins/session";
 import ReservationCheckinPayments from "@/domain/Reservation/Widgets/Checkin/ReservationPayments.vue";
 import CheckinStepNav from "@/domain/Reservation/Widgets/Checkin/CheckinStepNav.vue";
+import DataContainer from "@/components/DataContainer.vue";
 
 export default {
     name: "ReservationCheckin",
     mixins: [reservation, session],
     components: {
+      DataContainer,
       CheckinStepNav,
       ReservationCheckinPayments,
       ResponsiveStepper,
@@ -216,7 +217,7 @@ export default {
     },
     data(){
         return {
-            loading: false,
+            loading: true,
             currentStep: 1,
             verification: null,
             charges: null ,
@@ -231,15 +232,12 @@ export default {
 
     computed: {
         ...mapGetters(['current_user']),
-
         canStart() {
             return !!this.current_user.auth && !!this.current_user.profile
         },
-
         setting() {
             return this.reservation ? this.reservation.setting : null
         },
-
         steps() {
             const steps = [];
 
@@ -267,7 +265,7 @@ export default {
                 })
             }
 
-            if((this.reservation.agreements && this.reservation.questions.length) || this.additionalAgreements.length) {
+            if((this.reservation.agreements && this.reservation.agreements.length) || this.additionalAgreements.length) {
                 steps.push({
                     id: 'agreements',
                     name: 'Agreements',
@@ -283,7 +281,11 @@ export default {
             })
           }
 
-          if((this.reservation.charges && this.reservation.charges.length) || this.reservation.balance) {
+          if(
+              (this.reservation.charges && this.reservation.charges.length)
+              || this.reservation.balance
+              || this.attachedCharges.length
+          ) {
               steps.push({
                   id: 'payment',
                   name: 'Charges payment',
@@ -334,14 +336,6 @@ export default {
             const requiredQuestionsAnswered = () => {
                 return this.questions.every(question => question.required ? !!question.response : true);
             }
-
-            // const respondedQuestionAgreementsAgreed = () => {
-            //     return this.questions.every(question => {
-            //         if(question.response && question.response.agreement)  return question.response.agreement.agreed === true;
-            //         return true;
-            //     }); 
-            // }
-
             return requiredQuestionsAnswered();
         },
 
@@ -414,27 +408,26 @@ export default {
           return this.noOfNight >= this.setting.max_period_for_charge_authorization
         }
     },
-
-    methods: {
+  mounted() {
+      if(this.current_user.auth && this.current_user.profile) {
+        this.loading = false;
+        return;
+      }
+      this.loading = true
+      this.syncAuthUser().finally(() => {
+        this.loading = false;
+      })
+  },
+  methods: {
         ...mapActions([
             'mutate',
+            'syncAuthUser'
         ]),
-        ...mapMutations([
-          'SET_AUTH_REQUIRED'
-        ]),
-
         stepChanged(step) {
             this.currentStep = step;
         },
     },
-
   watch: {
-      reservation: {
-          immediate: true,
-          handler(){
-            this.SET_AUTH_REQUIRED(!this.canStart)
-          }
-      },
       canStart: {
         immediate: true,
         handler(start) {
