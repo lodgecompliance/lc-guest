@@ -34,6 +34,7 @@ jobs:
           echo VUE_APP_URL='${{ vars.APP_URL }}' >> .env
           echo VUE_APP_NAME='${{ vars.APP_NAME }}' >> .env
           echo VUE_APP_API_BASE_URL='${{ vars.API_BASE_URL }}' >> .env
+          echo VUE_APP_LC_SDK='${{ vars.LC_SDK }}' >> .env          
           echo VUE_APP_AUTH_DOMAIN='${{ vars.AUTH_DOMAIN }}' >> .env
           echo VUE_APP_GOOGLE_API_KEY='${{ secrets.GOOGLE_API_KEY }}' >> .env
           echo VUE_APP_FIREBASE_API_KEY='${{ secrets.FIREBASE_API_KEY }}' >> .env
