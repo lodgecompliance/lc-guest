@@ -78,7 +78,7 @@
                           </template>
                         </reservation-stripe-single-payment>
                         <reservation-paystack-single-payment
-                            v-if="reservation.setting.payment_gateway === 'paystack'"
+                            v-else-if="reservation.setting.payment_gateway === 'paystack'"
                             :property="property"
                             :reservation="reservation"
                             :charge="charge"

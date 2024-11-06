@@ -149,8 +149,7 @@ export default {
         },
 
         customerName() {
-            if(!this.$store.getters.current_user.profile.name) return '';
-            return [this.$store.getters.current_user.profile.first_name, this.$store.getters.current_user.profile.last_name].join(' ')
+            return this.$store.getters.current_user.profile.full_name;
         },
 
         totalPaying() {

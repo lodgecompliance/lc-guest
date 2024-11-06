@@ -97,8 +97,9 @@ export default {
   },
   methods: {
     startPayment() {
-      if(this.availableSource) this.completePayment();
-      else this.dialog = true;
+      // if(this.availableSource) this.completePayment();
+      // else this.dialog = true;
+      this.dialog = true;
     },
     customerReceived(customer) {
         this.customer = customer;
