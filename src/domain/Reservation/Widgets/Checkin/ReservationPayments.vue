@@ -13,10 +13,6 @@
             :fetch-payments="true"
             :capture-pre-authorize="capturePreAuthorize"
         >
-          <template #label="{ allChargesPaid }">
-            <p v-if="!allChargesPaid" class="grey--text">Select charges to pay</p>
-          </template>
-
           <template #default="{ charge, payment }">
 
             <template v-if="charge.type === 'pre-authorize'">
