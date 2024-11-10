@@ -28,7 +28,7 @@
                     <!-- ID verification -->
                     <reservation-id-verification v-if="step.id === 'id-verification'"
                                                  :user-id="current_user.profile.id"
-                                                 @verification="(v) => verification = v"
+                                                 @verification="idVerification"
                     >
                       <template #default="{ loading, verification }">
                         <v-card-text v-if="verification">
@@ -421,11 +421,18 @@ export default {
   methods: {
         ...mapActions([
             'mutate',
+            'authenticate',
             'syncAuthUser'
         ]),
         stepChanged(step) {
             this.currentStep = step;
         },
+      async idVerification(v) {
+          this.verification = v;
+        if(this.reservation.require_id_verification && !v.acceptable) {
+          await this.authenticate()
+        }
+      }
     },
   watch: {
       canStart: {

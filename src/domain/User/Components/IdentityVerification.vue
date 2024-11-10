@@ -18,7 +18,7 @@
                    border="left"
                    colored-border
           >
-            ID was manually uploaded
+            ID was manually completed
           </v-alert>
           <v-alert v-else
                    type="warning"
@@ -101,6 +101,7 @@ export default {
               smile {
                 verified
               }
+              acceptable
             }
           }
         }
