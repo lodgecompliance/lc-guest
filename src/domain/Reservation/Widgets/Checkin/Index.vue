@@ -1,10 +1,9 @@
 <template>
     <data-container :loading="loading">
         <template v-if="canStart" >
-          <p class="py-5">Kindly complete your checkin process</p>
+          <p>Kindly complete your checkin process</p>
           <responsive-stepper flat non-linear @change="stepChanged" :step="currentStep" style="box-shadow: none">
             <template v-for="(step, i) in steps">
-
               <template>
                 <v-stepper-step
                     :key="`step-${step.id}`"
@@ -26,9 +25,10 @@
                   <div class="pa-1">
 
                     <!-- ID verification -->
-                    <reservation-id-verification v-if="step.id === 'id-verification'"
-                                                 :user-id="current_user.profile.id"
-                                                 @verification="idVerification"
+                    <reservation-id-verification
+                        v-if="step.id === 'id-verification'"
+                       :user-id="current_user.profile.id"
+                       @verification="idVerification"
                     >
                       <template #default="{ loading, verification }">
                         <v-card-text v-if="verification">
@@ -45,11 +45,12 @@
                     </reservation-id-verification>
 
                     <!-- Guest -->
-                    <reservation-guest v-if="step.id === 'guest'"
-                                       :property="property"
-                                       :reservation="reservation"
-                                       @guests="g => guests = g"
-                                       @continue="currentStep++"
+                    <reservation-guest
+                        v-if="step.id === 'guest'"
+                       :property="property"
+                       :reservation="reservation"
+                       @guests="g => guests = g"
+                       @continue="currentStep++"
                     >
                       <template #default="{ submitting, submit }">
                         <checkin-step-nav
@@ -64,10 +65,11 @@
                     </reservation-guest>
 
                     <!-- Questions -->
-                    <reservation-questions v-if="step.id === 'questions'"
-                                           :reservation="reservation"
-                                           @questions="q => questions = q"
-                                           @continue="currentStep++"
+                    <reservation-questions
+                        v-if="step.id === 'questions'"
+                       :reservation="reservation"
+                       @questions="q => questions = q"
+                       @continue="currentStep++"
                     >
                       <template #default="{ submitting, submit }">
                         <checkin-step-nav
@@ -82,11 +84,12 @@
                     </reservation-questions>
 
                     <!-- Agreements -->
-                    <reservation-agreements v-if="step.id === 'agreements'"
-                                            :reservation="reservation"
-                                            :additional-agreements="additionalAgreements"
-                                            @agreements="a => agreements = a"
-                                            @continue="currentStep++"
+                    <reservation-agreements
+                        v-if="step.id === 'agreements'"
+                        :reservation="reservation"
+                        :additional-agreements="additionalAgreements"
+                        @agreements="a => agreements = a"
+                        @continue="currentStep++"
                     >
                       <template #default="{ submitting, submit }">
                         <checkin-step-nav
@@ -110,11 +113,12 @@
                     </reservation-agreements>
 
                     <!-- Credit card -->
-                    <reservation-checkin-credit-card v-if="step.id === 'credit-card'"
-                                                     :reservation="reservation"
-                                                     :property="property"
-                                                     @credit-card="cc => credit_card = cc"
-                                                     @continue="currentStep++"
+                    <reservation-checkin-credit-card
+                        v-if="step.id === 'credit-card'"
+                       :reservation="reservation"
+                       :property="property"
+                       @credit-card="cc => credit_card = cc"
+                       @continue="currentStep++"
                     >
                       <template #default="{ submitting, submit }">
                         <checkin-step-nav
@@ -129,15 +133,16 @@
                     </reservation-checkin-credit-card>
 
                     <!-- Payment -->
-                    <reservation-checkin-payments v-if="step.id === 'payment'"
-                                                  :property="property"
-                                                  :reservation="reservation"
-                                                  :credit-card="credit_card"
-                                                  :extra-charges="attachedCharges"
-                                                  :capture-pre-authorize="capturePreAuthorize"
-                                                  @charges="c => charges = c"
-                                                  @credit-card="cc => credit_card = cc"
-                                                  @continue="currentStep++"
+                    <reservation-checkin-payments
+                        v-if="step.id === 'payment'"
+                        :property="property"
+                        :reservation="reservation"
+                        :credit-card="credit_card"
+                        :extra-charges="attachedCharges"
+                        :capture-pre-authorize="capturePreAuthorize"
+                        @charges="c => charges = c"
+                        @credit-card="cc => credit_card = cc"
+                        @continue="currentStep++"
                     >
                       <template #default="{ submit }">
                         <checkin-step-nav
@@ -230,7 +235,7 @@ export default {
         }
     },
 
-    computed: {
+  computed: {
         ...mapGetters(['current_user']),
         canStart() {
             return !!this.current_user.auth && !!this.current_user.profile
@@ -409,14 +414,14 @@ export default {
         }
     },
   mounted() {
-      if(this.current_user.auth && this.current_user.profile) {
-        this.loading = false;
-        return;
-      }
-      this.loading = true
-      this.syncAuthUser().finally(() => {
-        this.loading = false;
-      })
+    if(this.current_user.auth && this.current_user.profile) {
+      this.loading = false;
+      return;
+    }
+    this.loading = true
+    this.syncAuthUser().finally(() => {
+      this.loading = false;
+    })
   },
   methods: {
         ...mapActions([
@@ -428,8 +433,8 @@ export default {
             this.currentStep = step;
         },
       async idVerification(v) {
-          this.verification = v;
-        if(this.reservation.require_id_verification && !v.acceptable) {
+        this.verification = v;
+        if(this.reservation.require_id_verification && !v?.acceptable) {
           await this.authenticate()
         }
       }

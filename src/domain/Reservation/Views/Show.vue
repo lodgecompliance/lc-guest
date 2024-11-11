@@ -48,27 +48,28 @@
                       </template>
                       <v-col v-else md="12">
                         <v-row justify="center">
-                          <v-col cols="12" md="6">
-                            <v-sheet elevation="5" rounded>
-                              <v-container>
-                                <h2 class="headline">Booking Details</h2>
+                          <v-col cols="12" md="4">
+                            <h2 class="headline text-center">Booking Details</h2>
+                            <v-card rounded flat>
+                              <v-card-text>
                                 <reservation-details :reservation="reservation" display-type="edge" />
+                              </v-card-text>
+                              <v-card-actions>
                                 <v-btn
                                     v-if="!canStart"
-                                    text
-                                    dark color="accent-4"
-                                    class="primary mt-5"
-                                    block
+                                    depressed block
+                                    class="primary"
                                     @click="getStarted"
                                     :loading="starting"
                                     :disabled="starting"
                                 >
                                   Start Checkin
                                 </v-btn>
-                              </v-container>
-                            </v-sheet>
+                              </v-card-actions>
+                            </v-card>
+                          </v-col>
+                          <v-col cols="12" md="6" v-if="canStart">
                             <reservation-checkin
-                                v-if="canStart"
                                 :property="property"
                                 :reservation="reservation"
                                 :startAgainPath="startPath"
