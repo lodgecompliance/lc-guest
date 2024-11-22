@@ -150,6 +150,7 @@ export default {
         },
 
         addCurrentUserAsGuest() {
+            console.log("profile log", this.current_user.profile);
             this.guests.unshift({
                 user_id: this.current_user.profile.id,
                 name: this.current_user.profile.full_name,

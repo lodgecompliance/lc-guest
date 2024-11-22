@@ -5,7 +5,8 @@
             <small>Your authorized card at {{ property.name }} </small>
           </div>
             <v-radio-group 
-                v-model="creditCard" 
+                v-model="creditCard"
+                @change="handleCardChange"
                 :label="``"
                 :rules="[(value) => !value && !addCard ? 'Select a credit card' : true]"
                 >
@@ -93,7 +94,11 @@ export default {
             'query', 'mutate'
         ]),
 
-        getPropertyIntegration() {
+      handleCardChange(value) {
+        this.$emit('credit-card',  value);
+      },
+
+      getPropertyIntegration() {
           return new Promise((resolve, reject) => {
             this.query({
               query: gql`
@@ -163,9 +168,14 @@ export default {
           this.loading = true;
           this.getPaystackCustomer()
           .then(customer => {
-            this.$emit('customer-fetched', customer)
-            if(!this.cards.length) this.addCard = true;
-            else this.creditCard = this.cards[0];
+            this.$emit('customer-fetched', customer);
+            if(!this.cards.length) {
+              this.addCard = true
+            } else {
+              this.creditCard = this.cards[0];
+              // Notify listeners of the selected card
+              this.$emit('credit-card',  this.creditCard);
+            }
           })
           .catch(e => this.error = e)
           .finally(() => this.loading = false)
@@ -180,12 +190,16 @@ export default {
                 }
             }
             this.creditCard = card;
+            this.$emit('credit-card', card);
             this.addCard = false
         }
     },
 
     mounted() {
-      if(this.value) this.creditCard = this.value
+      if(this.value) {
+        this.creditCard = this.value;
+        this.$emit('credit-card',  this.creditCard);
+      }
     },
 
     watch: {
@@ -196,12 +210,12 @@ export default {
             }
         },
 
-        creditCard: {
-            immediate: true,
-            handler(card){
-                this.$emit('credit-card', card)
-            }
-        }
+        // creditCard: {
+        //     immediate: true,
+        //     handler(card){
+        //         this.$emit('credit-card', card)
+        //     }
+        // }
     }
 
 }
