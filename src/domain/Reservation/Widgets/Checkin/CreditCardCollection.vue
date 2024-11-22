@@ -144,13 +144,14 @@ export default {
         }
       }
     },
-    creditCard: {
-      immediate: true,
-      deep: true,
-      handler(cc) {
-        this.$emit('credit-card', cc)
-      }
-    }
+    // creditCard: {
+    //   immediate: true,
+    //   deep: true,
+    //   handler(cc) {
+    //     console.log("CC", cc);
+    //     this.$emit('credit-card', cc)
+    //   }
+    // }
   }
 }
 </script>
