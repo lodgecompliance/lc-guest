@@ -75,6 +75,7 @@ export default {
 
     computed: {
          reservationOwner() {
+           console.log("reservationOwner", this.$store.getters.current_user);
             return this.reservation.user_id === this.$store.getters.current_user.profile.id;
         },
         guestList() {

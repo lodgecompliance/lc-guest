@@ -5,8 +5,14 @@
         <h4>Instructions</h4>
       </v-expansion-panel-header>
       <v-expansion-panel-content class="pt-3">
-        <div v-if="reservation.instruction" v-html="reservation.instruction"></div>
-        <div v-else class="py-5 grey--text text-center">No instruction</div>
+        <v-list v-if="reservation.instructions.length">
+          <property-instruction
+              v-for="(instruction, i) in reservation.instructions"
+              :key="i" :instruction="instruction" />
+        </v-list>
+        <div v-else class="my-5 grey--text text-center">
+          No instruction for the reservation
+        </div>
       </v-expansion-panel-content>
     </v-expansion-panel>
   </v-expansion-panels>
@@ -15,9 +21,11 @@
 
 <script>
 
+import PropertyInstruction from "@/domain/Property/Components/PropertyInstruction.vue";
+
 export default {
     name: "ReservationInstructionExpansion",
-    components: {},
+    components: {PropertyInstruction},
     data(){
         return {
             panel: null

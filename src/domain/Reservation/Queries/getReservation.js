@@ -114,6 +114,12 @@ export default gql`
                     unit
                 }
             }
+
+            instructions {
+                id
+                title
+                body
+            }
             agreements {
                 id
                 agreement
