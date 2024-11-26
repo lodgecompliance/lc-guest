@@ -208,8 +208,7 @@ export default {
                                   .map(transaction => transaction.data);
 
               if(transactions.length) {
-                  const totalPaid = transactions.map(transaction => transaction.amount)
-                                  .reduce((a,b) => a+b, 0);
+                  const totalPaid = transactions.map(transaction => transaction.amount).reduce((a,b) => a+b, 0);
                   this.$store.commit('SNACKBAR', {
                       status: true,
                       color: 'success',

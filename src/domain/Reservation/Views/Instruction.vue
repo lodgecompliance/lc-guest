@@ -7,9 +7,11 @@
       >
         <h2 class="headline my-5">Instructions</h2>
         <div v-if="reservation.approved">
-          <div class="py-5" v-if="reservation.instruction">
-            {{reservation.instruction}}
-          </div>
+          <v-list v-if="reservation.instructions.length">
+            <property-instruction
+                v-for="(instruction, i) in reservation.instructions"
+                :key="i" :instruction="instruction" />
+          </v-list>
           <div class="text-center py-5 grey--text" v-else>
             No checkin instruction
           </div>
@@ -32,12 +34,14 @@
 <script>
 import ReservationPage from "@/domain/Reservation/Views/Show.vue";
 import ReservationCheckedinPage from "@/domain/Reservation/Widgets/CheckedInPage.vue";
+import PropertyInstruction from "@/domain/Property/Components/PropertyInstruction.vue";
 
 export default {
   name: 'ReservationInstructionPage',
   components: {
     ReservationCheckedinPage,
-    ReservationPage
+    ReservationPage,
+    PropertyInstruction
   }, 
   data(){
       return {}
