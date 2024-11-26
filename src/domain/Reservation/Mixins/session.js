@@ -263,6 +263,12 @@ export default {
         },
 
         submitGuests(guests) {
+            let tempSessionId;
+            if (this.checkin_session.session) {
+                tempSessionId = this.checkin_session.session.id;
+            } else {
+                tempSessionId = this.$route.query.session;
+            }
             return this.mutate({
                 mutation: gql `mutation submitReservationGuests($reservation_id: ID!, $session_id: ID!, $guests: [ReservationGuestInput]){
                     submitReservationGuests(reservation_id: $reservation_id, session_id: $session_id, guests: $guests) {
@@ -271,7 +277,7 @@ export default {
                   }`,
                 variables: {
                     reservation_id: this.checkin_session.reservation.id,
-                    session_id: this.checkin_session.session.id,
+                    session_id: tempSessionId,
                     guests
                 }
             }).then(response => {
