@@ -13,15 +13,6 @@
                 Don't forget to send the link above to your guests for confirmation
               </v-alert>
             </div>
-<!--            <v-btn-->
-<!--            color="primary"-->
-<!--            dark-->
-<!--            @click="createNew = true"-->
-<!--            v-if="reservationOwner"-->
-<!--            small text-->
-<!--            >-->
-<!--                <v-icon>mdi-plus</v-icon> Add New Guest-->
-<!--            </v-btn>-->
             <reservation-guest-form
             v-if="createNew"
             class="mt-5"
@@ -75,7 +66,6 @@ export default {
 
     computed: {
          reservationOwner() {
-           console.log("reservationOwner", this.$store.getters.current_user);
             return this.reservation.user_id === this.$store.getters.current_user.profile.id;
         },
         guestList() {
