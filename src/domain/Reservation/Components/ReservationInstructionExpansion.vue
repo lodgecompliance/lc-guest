@@ -5,7 +5,7 @@
         <h4>Instructions</h4>
       </v-expansion-panel-header>
       <v-expansion-panel-content class="pt-3">
-        <v-list v-if="reservation.instructions.length">
+        <v-list v-if="reservation.instructions && reservation.instructions.length">
           <property-instruction
               v-for="(instruction, i) in reservation.instructions"
               :key="i" :instruction="instruction" />
